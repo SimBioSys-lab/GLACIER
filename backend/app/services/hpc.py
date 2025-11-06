@@ -70,7 +70,7 @@ def _put_file(sftp: paramiko.SFTPClient, local: str, remote: str) -> None:
 
 def setup_hpc_directories(ssh: paramiko.SSHClient, req_user_id: str) -> dict:
     """
-    Navigate to GlycoMap-Engine and create directory structure:
+    Navigate to GlycoShield and create directory structure:
     - inputs/
     - outputs/
     - logs/

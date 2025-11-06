@@ -26,8 +26,8 @@ class Settings(BaseModel):
     HPC_SSH_PASSPHRASE: Optional[str] = os.getenv("HPC_SSH_PASSPHRASE")
     HPC_KNOWN_HOSTS: Optional[str] = os.getenv("HPC_KNOWN_HOSTS")
 
-    # HPC GlycoMap-Engine Configuration
-    HPC_BASE_DIR: str = os.getenv("HPC_BASE_DIR", "/scratch/rajagopalmohanraj.n/GlycoMap-Engine")
+    # HPC GlycoShield Configuration
+    HPC_BASE_DIR: str = os.getenv("HPC_BASE_DIR", "/projects/SimBioSys/share/software/GlycoShield")
     HPC_PIPELINE_SCRIPT: str = os.getenv("HPC_PIPELINE_SCRIPT", "pipeline.sh")
 
     @property
