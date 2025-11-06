@@ -1,0 +1,3 @@
+[submodule "GlycoMap-Engine"]
+	path = GlycoMap-Engine
+	url = https://github.com/Naveen-R-M/GlycoMap-Engine.git

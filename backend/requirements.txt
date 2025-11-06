@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+python-dotenv
+pydantic
+requests
+jinja2
+python-multipart
+psutil
+paramiko
