@@ -69,7 +69,7 @@ export default function Header({ onScrollToForm }: HeaderProps) {
               {/* Logo - Exact typography */}
               <div className="flex items-center space-x-3">
                 
-                <h1 className="text-xl font-bold tracking-tight">GlycoMap</h1>
+                <h1 className="text-xl font-bold tracking-tight">GLACIER</h1>
                 {/* Tagline: always animate on refresh */}
                 <motion.div
                   className="text-xs text-[#1A1A1A]/70 leading-tight will-change-transform"
@@ -77,9 +77,9 @@ export default function Header({ onScrollToForm }: HeaderProps) {
                   initial="hidden"
                   animate="show"
                 >
-                  <motion.div variants={lineVariants}>Product</motion.div>
-                  <motion.div variants={lineVariants} className="text-center">of</motion.div>
-                  <motion.div variants={lineVariants}>SimBioSys</motion.div>
+                  <motion.div variants={lineVariants}>A</motion.div>
+                  <motion.div variants={lineVariants} className="text-center">SimBioSys</motion.div>
+                  <motion.div variants={lineVariants}>Initiative</motion.div>
                 </motion.div>
               </div>
 
