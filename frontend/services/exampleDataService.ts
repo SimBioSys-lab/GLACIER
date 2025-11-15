@@ -1,5 +1,5 @@
 /**
- * Example Data Service for GlycoMap
+ * Example Data Service for GlycoShield
  * Provides example files for demonstration purposes
  */
 
@@ -21,7 +21,7 @@ export const EXAMPLE_DATA = {
     fullName: '',
     email: '',
     organization: 'SimBioSys Lab Demo',
-    description: 'This is an example run demonstrating the GlycoMap processing pipeline'
+    description: 'This is an example run demonstrating the GlycoShield processing pipeline'
   }
 }
 

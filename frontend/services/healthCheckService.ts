@@ -1,5 +1,5 @@
 /**
- * Health Check Service for GlycoMap Backend
+ * Health Check Service for GlycoShield Backend
  * Automatically wakes up the Render.com free tier backend when the frontend loads
  */
 
