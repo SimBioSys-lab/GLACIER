@@ -23,7 +23,7 @@ const nothingFont = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "GlycoMap - SimBioSys Lab",
+  title: "GLACIER - SimBioSys Lab Initiative",
   description: "Computational biology platform for glycoprotein structure analysis",
 };
 
