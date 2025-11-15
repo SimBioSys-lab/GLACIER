@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from "react"
 import Header from "@/components/layout/Header"
 import Footer from "@/components/layout/Footer"
 import HeroSection from "@/components/hero/HeroSection"
+import VideoHeroSection from "@/components/hero/VideoHeroSection"
 import MultiStepForm from "@/components/form/MultiStepForm"
 import { SubmissionStatus } from "@/components/submission-status"
 
@@ -63,8 +64,9 @@ export default function CicadaSimBioSysInterface() {
 
       {/* Main Content Container - Starts at viewport top */}
       <main className="relative">
-        {/* Hero Section with 3D Scene */}
-        <HeroSection onScrollToForm={scrollToForm} />
+        {/* Hero Section with Video Background */}
+        <VideoHeroSection onScrollToForm={scrollToForm} />
+        
 
         {/* Multi-Step Form Section */}
         <MultiStepForm 
