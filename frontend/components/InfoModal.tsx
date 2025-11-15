@@ -37,7 +37,7 @@ export function InfoModal({ isOpen, onClose }: InfoModalProps) {
             <div className="bg-gradient-to-r from-[#8B7DFF]/10 to-[#1A1A1A]/10 border-b border-[#1A1A1A]/10 px-6 py-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-light text-[#1A1A1A]">
-                  GlycoMap Processing Pipeline
+                  GLACIER Pipeline
                 </h2>
                 <button
                   onClick={onClose}
@@ -382,7 +382,7 @@ export function InfoModal({ isOpen, onClose }: InfoModalProps) {
             <div className="border-t border-[#1A1A1A]/10 px-6 py-4 bg-[#F5F4F9]/30">
               <div className="flex items-center justify-between">
                 <p className="text-xs text-[#1A1A1A]/60">
-                  GlycoMap - Computational Biology Platform for SimBioSys Lab
+                  GLACIER - Computational Biology Platform for SimBioSys Lab
                 </p>
                 <button
                   onClick={onClose}
