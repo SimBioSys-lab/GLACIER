@@ -156,11 +156,11 @@ export default function VideoHeroSection({ onScrollToForm }: VideoHeroSectionPro
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.4 }}
                 >
-                  Our mission is to make
+                  Our mission is to decode
                   <br />
-                  <span className="font-normal text-[#8B7DFF]">advanced genomics</span>
+                  <span className="font-normal text-[#8B7DFF]">glycan shields</span>
                   <br />
-                  accessible everywhere.
+                  protecting viral proteins.
                 </motion.h1>
 
                 {/* Subheadline */}
@@ -172,9 +172,9 @@ export default function VideoHeroSection({ onScrollToForm }: VideoHeroSectionPro
                 >
                   <TypewriterParagraph
                     className="text-base md:text-lg text-[#1A1A1A]/85 leading-relaxed"
-                    lead="At SimBioSys, we believe advanced genomics shouldn't be confined to labs. "
-                    highlight="Democratizing scientific discovery"
-                    tail=" through accessible computational tools."
+                    lead="At SimBioSys, we believe understanding protein glycosylation shouldn't require supercomputing expertise. "
+                    highlight="Democratizing structural biology through accessible computational tools that reveal "
+                    tail="how glycans shield and expose protein surfaces."
                     speed={22}        // tweak typing speed (ms/char)
                     startDelay={550}  // aligns with your motion.div delay
                   />

@@ -6,6 +6,8 @@ import Footer from "@/components/layout/Footer"
 import HeroSection from "@/components/hero/HeroSection"
 import VideoHeroSection from "@/components/hero/VideoHeroSection"
 import MultiStepForm from "@/components/form/MultiStepForm"
+import CitationSection from "@/components/citation/CitationSection"
+import CitationWidget from "@/components/citation/CitationWidget"
 import { SubmissionStatus } from "@/components/submission-status"
 
 export default function CicadaSimBioSysInterface() {
@@ -76,6 +78,11 @@ export default function CicadaSimBioSysInterface() {
           onSubmitError={handleSubmitError}
         />
 
+        {/* Citation Section - New Addition */}
+        <div id="citation">
+          <CitationSection />
+        </div>
+
         {/* Status Messages */}
         <SubmissionStatus 
           isSubmitted={isSubmitted} 
@@ -87,6 +94,9 @@ export default function CicadaSimBioSysInterface() {
         {/* Footer Section */}
         <Footer />
       </main>
+
+      {/* Floating Citation Widget - Optional, can be toggled on/off */}
+      <CitationWidget />
     </div>
   )
 }

@@ -20,9 +20,6 @@
 }
 
 /* Use Nothing Font via CSS variable from Next.js font loading */
-.font-nothing {
-  font-family: var(--font-nothing, 'Nothing Font 5x7'), 'Courier New', monospace;
-}
 
 @custom-variant dark (&:is(.dark *));
 
@@ -142,11 +139,10 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: var(--font-nothing), 'Courier New', monospace;
   }
   
-  /* Apply Nothing Font to all text elements by default */
-  h1, h2, h3, h4, h5, h6, p, span, div, button, input, textarea, select, label {
-    font-family: var(--font-nothing), 'Courier New', monospace;
+  /* Only use Nothing Font for elements with the explicit .font-nothing class */
+  .font-nothing {
+    font-family: var(--font-nothing, 'Nothing Font 5x7'), 'Courier New', monospace;
   }
 }

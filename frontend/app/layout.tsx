@@ -33,10 +33,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={nothingFont.variable}>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${nothingFont.variable}`}>
       <body
-        className={`${nothingFont.className} ${geistSans.variable} ${geistMono.variable} antialiased`}
-        style={{ fontFamily: 'var(--font-nothing), monospace' }}
+        className={`${geistSans.className} antialiased`}
       >
         <BackendHealthCheck />
         {children}

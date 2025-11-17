@@ -9,12 +9,12 @@ export default function Footer() {
       <div className="container mx-auto px-6 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1 md:col-span-2">
-            <h3 className="text-2xl font-light text-white mb-4">
-              SimBioSys Lab
+            <h3 className="text-2xl font-light text-white mb-2">
+              GLACIER
             </h3>
+            <h2 className="text-white mb-3 text-xl font-light">Glycan Accessibility Computational Infrastructure for Ensemble Research</h2>
             <p className="text-white/70 leading-relaxed mb-6">
-              Pioneering the future of therapeutic protein design through advanced computational biology and machine
-              learning.
+              Advancing structural glycobiology through computational innovation and machine learning.
             </p>
             <div className="flex space-x-4">
               <Button variant="ghost" className="text-white/60 hover:text-white p-2">
@@ -31,27 +31,16 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="text-white font-medium mb-4">Platform</h4>
+            <h4 className="text-white font-medium mb-4">GlycoShield</h4>
             <ul className="space-y-2 text-white/70">
               <li>
-                <a href="#" className="hover:text-white transition-colors">
-                  Generative Biology
-                </a>
+                AllosMod Lib
               </li>
               <li>
-                <a href="#" className="hover:text-white transition-colors">
-                  Protein Design
-                </a>
+                Ensemble Modelling
               </li>
               <li>
-                <a href="#" className="hover:text-white transition-colors">
-                  Pipeline
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white transition-colors">
-                  Research
-                </a>
+                GEF Analysis
               </li>
             </ul>
           </div>
@@ -60,22 +49,12 @@ export default function Footer() {
             <h4 className="text-white font-medium mb-4">Company</h4>
             <ul className="space-y-2 text-white/70">
               <li>
-                <a href="#" className="hover:text-white transition-colors">
+                <a href="https://www.simbiosyslab.com/home" className="hover:text-white transition-colors" target="_blank">
                   About Us
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-white transition-colors">
-                  Careers
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white transition-colors">
-                  Media Center
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white transition-colors">
+                <a href="mailto:simbiosyslab.neu@gmail.com" className="hover:text-white transition-colors">
                   Contact
                 </a>
               </li>
