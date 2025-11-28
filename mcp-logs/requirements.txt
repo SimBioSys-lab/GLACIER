@@ -2,3 +2,6 @@ flask
 slack_bolt
 google-generativeai
 mcp
+httpx
+sse-starlette
+gunicorn
