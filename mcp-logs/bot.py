@@ -4,6 +4,7 @@ import asyncio
 import shutil
 import json
 import re
+from dotenv import load_dotenv
 from flask import Flask, request
 from slack_bolt import App
 from slack_bolt.adapter.flask import SlackRequestHandler
@@ -11,7 +12,8 @@ import google.generativeai as genai
 from google.generativeai.types import FunctionDeclaration, Tool
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
-from mcp.client.sse import sse_client
+
+load_dotenv()
 
 # ---------------- CONFIGURATION ----------------
 # Replace with your actual keys
@@ -83,10 +85,7 @@ async def fetch_render_logs(query=None, target="both", limit=50):
     
     logs = []
     try:
-        async with sse_client(
-            url="https://mcp.render.com/mcp", 
-            headers={"Authorization": f"Bearer {RENDER_API_KEY}"}
-        ) as (read, write):
+        async with stdio_client(server_params) as (read, write):
             async with ClientSession(read, write) as session:
                 await session.initialize()
                 
