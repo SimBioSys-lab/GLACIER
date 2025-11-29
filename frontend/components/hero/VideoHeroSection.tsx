@@ -121,18 +121,19 @@ export default function VideoHeroSection({ onScrollToForm }: VideoHeroSectionPro
           >
             <GlassSurface
               displace={0.5}
-              distortionScale={-180}
+              distortionScale={0}
               redOffset={0}
               greenOffset={10}
               blueOffset={20}
               brightness={100}
-              opacity={0.93}
-              backgroundOpacity={0}
+              opacity={0.9}
+              backgroundOpacity={0.5}
               saturation={1}
-              blur={11}
-              mixBlendMode="screen"
-              borderRadius={12}
-              borderWidth={0.07}
+              blur={25}
+              mixBlendMode="normal"
+              borderRadius={50}
+              borderWidth={0}
+              backgroundColor="#ffffff"
               width="100%"
               height="auto"
             >
@@ -151,16 +152,17 @@ export default function VideoHeroSection({ onScrollToForm }: VideoHeroSectionPro
 
                 {/* Headline */}
                 <motion.h1
-                  className="text-2xl md:text-3xl xl:text-4xl font-light leading-[1.1] text-[#1A1A1A] mb-6 tracking-[0.015em] max-w-[20ch]"
+                  className="text-2xl md:text-3xl xl:text-4xl font-light leading-[1.1] mb-6 tracking-[0.015em] max-w-[20ch] font-mono text-black/70"
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.4 }}
+                  style={{ fontFamily: 'var(--font-nothing), monospace' }}
                 >
                   Our mission is to decode
                   <br />
-                  <span className="font-normal text-[#8B7DFF]">glycan shields</span>
+                  <span className="font-normal text-[#8B7DFF]">Glycan Shielding</span>
                   <br />
-                  protecting viral proteins.
+                  on viral proteins.
                 </motion.h1>
 
                 {/* Subheadline */}
@@ -171,7 +173,7 @@ export default function VideoHeroSection({ onScrollToForm }: VideoHeroSectionPro
                   className="mb-10 max-w-lg"
                 >
                   <TypewriterParagraph
-                    className="text-base md:text-lg text-[#1A1A1A]/85 leading-relaxed"
+                    className="text-base md:text-lg font-mono text-black/70 leading-relaxed"
                     lead="At SimBioSys, we believe understanding protein glycosylation shouldn't require supercomputing expertise. "
                     highlight="Democratizing structural biology through accessible computational tools that reveal "
                     tail="how glycans shield and expose protein surfaces."
@@ -189,7 +191,7 @@ export default function VideoHeroSection({ onScrollToForm }: VideoHeroSectionPro
                 >
                   <motion.button
                     onClick={onScrollToForm}
-                    className="bg-[#8B7DFF] hover:bg-[#7B6DFF] text-white px-8 py-4 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
+                    className="bg-[#8B7DFF] hover:bg-[#7B6DFF] text-white px-8 py-4 rounded-lg font-medium font-mono transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     transition={{ duration: 0.12 }}

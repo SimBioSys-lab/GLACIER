@@ -1,12 +1,12 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
-import { motion } from "framer-motion"
 import { Quote, ChevronDown, ChevronUp } from "lucide-react"
 import GlassSurface from '../GlassSurface'
 
 export default function CitationWidget() {
   const [isOverFooter, setIsOverFooter] = useState(false)
+  const [showTooltip, setShowTooltip] = useState(false)
 
   const scrollToCitation = () => {
     const citationSection = document.getElementById('citation')
@@ -44,16 +44,10 @@ export default function CitationWidget() {
   }, [])
 
   return (
-    <motion.div
-      initial={{ x: 100, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      transition={{ 
-        type: "spring", 
-        stiffness: 300, 
-        damping: 25,
-        delay: 0.5 
-      }}
+    <div 
       className="fixed bottom-24 right-6 z-40 citation-widget"
+      onMouseEnter={() => setShowTooltip(true)}
+      onMouseLeave={() => setShowTooltip(false)}
     >
       <GlassSurface
         displace={0.3}
@@ -66,18 +60,17 @@ export default function CitationWidget() {
         borderWidth={0.05}
         className="group cursor-pointer"
       >
-        <motion.button
+        <button
           onClick={scrollToCitation}
           className={`
             px-5 py-3 flex items-center gap-2
             transition-all duration-300
+            hover:scale-105 active:scale-95
             ${isOverFooter 
               ? 'text-white hover:text-[#8B7DFF]' 
               : 'text-[#1A1A1A] hover:text-[#8B7DFF]'
             }
           `}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
           style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}
         >
           <Quote className="w-5 h-5" />
@@ -87,14 +80,16 @@ export default function CitationWidget() {
           ) : (
             <ChevronDown className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
           )}
-        </motion.button>
+        </button>
       </GlassSurface>
       
-      {/* Tooltip on hover - also changes color when over footer */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        whileHover={{ opacity: 1, y: 0 }}
-        className="absolute bottom-full right-0 mb-2 pointer-events-none"
+      {/* Tooltip on hover */}
+      <div 
+        className={`
+          absolute bottom-full right-0 mb-2 pointer-events-none
+          transition-opacity duration-200
+          ${showTooltip ? 'opacity-100' : 'opacity-0'}
+        `}
       >
         <div className={`
           text-xs px-3 py-1.5 rounded-lg whitespace-nowrap transition-colors duration-300
@@ -105,7 +100,7 @@ export default function CitationWidget() {
         `}>
           View citation formats
         </div>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   )
 }

@@ -28,6 +28,7 @@ const GlassSurface = ({
   blur = 11,
   displace = 0,
   backgroundOpacity = 0,
+  backgroundColor = null, // Added new prop
   saturation = 1,
   distortionScale = -180,
   redOffset = 0,
@@ -141,27 +142,11 @@ const GlassSurface = ({
   }, []);
 
   useEffect(() => {
-    if (!containerRef.current) return;
-
-    const resizeObserver = new ResizeObserver(() => {
-      setTimeout(updateDisplacementMap, 0);
-    });
-
-    resizeObserver.observe(containerRef.current);
-
-    return () => {
-      resizeObserver.disconnect();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
     setTimeout(updateDisplacementMap, 0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [width, height]);
 
   const supportsSVGFilters = () => {
-    // Return false during SSR and initial hydration to ensure consistency
     if (!isClientReady || typeof window === 'undefined' || typeof document === 'undefined' || typeof navigator === 'undefined') {
       return false;
     }
@@ -192,6 +177,29 @@ const GlassSurface = ({
   };
 
   const getContainerStyles = () => {
+    // Helper to process background color + opacity
+    const getBackgroundValue = () => {
+      // 1. If user provided a color
+      if (backgroundColor) {
+        // If it's a Hex code, convert to RGBA to respect backgroundOpacity
+        if (backgroundColor.startsWith('#')) {
+          let c = backgroundColor.substring(1).split('');
+          if (c.length === 3) c = [c[0], c[0], c[1], c[1], c[2], c[2]];
+          c = parseInt(c.join(''), 16);
+          return `rgba(${(c >> 16) & 255}, ${(c >> 8) & 255}, ${c & 255}, ${backgroundOpacity})`;
+        }
+        // If it's already rgba/hsla/named color, return as is
+        return backgroundColor;
+      }
+
+      // 2. Default Fallbacks (White for Light mode, Black for Dark mode)
+      return isDarkMode 
+        ? `hsl(0 0% 0% / ${backgroundOpacity})` 
+        : `hsl(0 0% 100% / ${backgroundOpacity})`;
+    };
+
+    const finalBackground = getBackgroundValue();
+
     const baseStyles = {
       ...style,
       width: typeof width === 'number' ? `${width}px` : width,
@@ -205,7 +213,7 @@ const GlassSurface = ({
     if (!isClientReady) {
       return {
         ...baseStyles,
-        background: 'rgba(255, 255, 255, 0.25)',
+        background: finalBackground, // Use the calculated background
         backdropFilter: 'blur(12px) saturate(1.8) brightness(1.1)',
         WebkitBackdropFilter: 'blur(12px) saturate(1.8) brightness(1.1)',
         border: '1px solid rgba(255, 255, 255, 0.3)',
@@ -222,7 +230,7 @@ const GlassSurface = ({
     if (svgSupported) {
       return {
         ...baseStyles,
-        background: isDarkMode ? `hsl(0 0% 0% / ${backgroundOpacity})` : `hsl(0 0% 100% / ${backgroundOpacity})`,
+        background: finalBackground, // Applied here
         backdropFilter: `url(#${filterId}) saturate(${saturation})`,
         boxShadow: isDarkMode
           ? `0 0 2px 1px color-mix(in oklch, white, transparent 65%) inset,
@@ -243,6 +251,7 @@ const GlassSurface = ({
              0px 16px 56px rgba(17, 17, 26, 0.05) inset`
       };
     } else {
+      // Fallback for browsers without SVG filter support (Safari/Firefox)
       if (isDarkMode) {
         if (!backdropFilterSupported) {
           return {
@@ -255,7 +264,7 @@ const GlassSurface = ({
         } else {
           return {
             ...baseStyles,
-            background: 'rgba(255, 255, 255, 0.1)',
+            background: finalBackground, // Applied here
             backdropFilter: 'blur(12px) saturate(1.8) brightness(1.2)',
             WebkitBackdropFilter: 'blur(12px) saturate(1.8) brightness(1.2)',
             border: '1px solid rgba(255, 255, 255, 0.2)',
@@ -275,7 +284,7 @@ const GlassSurface = ({
         } else {
           return {
             ...baseStyles,
-            background: 'rgba(255, 255, 255, 0.25)',
+            background: finalBackground, // Applied here
             backdropFilter: 'blur(12px) saturate(1.8) brightness(1.1)',
             WebkitBackdropFilter: 'blur(12px) saturate(1.8) brightness(1.1)',
             border: '1px solid rgba(255, 255, 255, 0.3)',

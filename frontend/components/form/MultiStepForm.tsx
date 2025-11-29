@@ -1,7 +1,7 @@
 "use client"
 
 import React, { forwardRef } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import { AnimatePresence } from "framer-motion"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -23,12 +23,10 @@ const MultiStepForm = forwardRef<HTMLDivElement, MultiStepFormProps>(
     const {
       currentStep,
       files,
-      numberOfRuns,
-      GEFProbeRadius,
+      folderConfigs,
       formData,
       setFiles,
-      setNumberOfRuns,
-      setGEFProbeRadius,
+      updateFolderConfig,
       setFormData,
       nextStep,
       prevStep,
@@ -45,8 +43,7 @@ const MultiStepForm = forwardRef<HTMLDivElement, MultiStepFormProps>(
       try {
         const response = await SubmissionService.submit({
           files,
-          numberOfRuns,
-          GEFProbeRadius,
+          folderConfigs,
           formData,
         })
         
@@ -68,27 +65,24 @@ const MultiStepForm = forwardRef<HTMLDivElement, MultiStepFormProps>(
     return (
       <section ref={ref} className="relative min-h-screen bg-white">
         <div className="container mx-auto px-6 py-16">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={showForm ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
-            transition={{ duration: 0.8 }}
-            className="w-full max-w-4xl mx-auto"
+          <div
+            className={`w-full max-w-4xl mx-auto transition-opacity duration-300 ${
+              showForm ? 'opacity-100' : 'opacity-0'
+            }`}
           >
             <Card className="bg-white/80 backdrop-blur-sm border border-[#1A1A1A]/10 rounded-2xl shadow-xl">
               <CardContent className="p-8">
                 {/* Step Indicator */}
                 <StepIndicator currentStep={currentStep} />
 
-                {/* Form Content */}
+                {/* Form Content - Only keep essential animations for step transitions */}
                 <AnimatePresence mode="wait">
                   {currentStep === 1 && (
                     <StepOne
                       files={files}
-                      numberOfRuns={numberOfRuns}
-                      GEFProbeRadius={GEFProbeRadius}
+                      folderConfigs={folderConfigs}
                       onFilesChange={setFiles}
-                      onNumberOfRunsChange={setNumberOfRuns}
-                      onGEFProbeRadiusChange={setGEFProbeRadius}
+                      updateFolderConfig={updateFolderConfig}
                       onFormDataChange={setFormData}
                     />
                   )}
@@ -141,13 +135,13 @@ const MultiStepForm = forwardRef<HTMLDivElement, MultiStepFormProps>(
                 </div>
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
         </div>
       </section>
     )
   }
 )
 
-MultiStepForm.displayName = "MultiStepForm"
+MultiStepForm.displayName = 'MultiStepForm'
 
 export default MultiStepForm
