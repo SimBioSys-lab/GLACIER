@@ -309,7 +309,7 @@ def stage_folders_and_start_pipeline(
                 "folder": folder_name
             }
             
-            metadata_path = posixpath.join(hpc_folder_path, "metadata.json")
+            metadata_path = posixpath.join(hpc_folder_path, "metadata.txt")
             with sftp.file(metadata_path, "w") as f:
                 f.write(json.dumps(metadata, indent=2))
             
