@@ -128,13 +128,10 @@ export const useFormState = () => {
   }, [currentStep, folderConfigs])
 
   const canSubmit = useCallback(() => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    
-    return formData.fullName.trim() !== '' && 
-           formData.email.trim() !== '' && 
-           emailRegex.test(formData.email) &&
-           formData.organization.trim() !== ''
-  }, [formData])
+    // All fields are now optional, so submission is always allowed
+    // The form can be submitted even with empty fields
+    return true
+  }, [])
 
   return {
     // State
