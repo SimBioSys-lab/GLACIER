@@ -125,7 +125,7 @@ def run_gemini_agent(user_query, user_id):
     )
 
     model = genai.GenerativeModel(
-        model_name='gemini-1.5-flash',
+        model_name='gemini-2.5-pro',
         tools=[Tool(function_declarations=[get_logs_tool])],
         system_instruction=system_instruction
     )
