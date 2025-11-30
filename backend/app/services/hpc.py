@@ -22,7 +22,7 @@ def _connect():
             key_path = os.path.normpath(key_path)
         
         # Only try to load key if the file actually exists
-        if os.path.isfile(key_path):
+        if os.isfile(key_path):
             passphrase = getattr(settings, "HPC_SSH_PASSPHRASE", None)
             try:
                 pkey = paramiko.Ed25519Key.from_private_key_file(key_path, password=passphrase)
@@ -209,12 +209,10 @@ EOF
 def call_pipeline_script(
     ssh: paramiko.SSHClient,
     user_inputs_dir: str,
-    req_user_id: str,
-    email: str,
-    name: str
 ) -> dict:
     """
-    Call pipeline.sh script with required parameters.
+    Call pipeline.sh script with only the input directory.
+    The pipeline script expects to find metadata.txt inside the directory.
     """
     if not user_inputs_dir.endswith('/'):
         user_inputs_dir += '/'
@@ -223,7 +221,7 @@ def call_pipeline_script(
         set -e
         cd {settings.HPC_BASE_DIR}
         chmod +x {settings.HPC_PIPELINE_SCRIPT} 2>/dev/null || true
-        ./{settings.HPC_PIPELINE_SCRIPT} '{user_inputs_dir}' '{req_user_id}' '{email}' '{name}'
+        ./{settings.HPC_PIPELINE_SCRIPT} '{user_inputs_dir}'
     """.strip()
     
     code, out, err = _run_remote(ssh, cmd)
@@ -250,11 +248,10 @@ def call_pipeline_script(
         "exit_code": 0 if (jobs_submitted or folders_processed) else code,
         "stdout": out.strip(),
         "stderr": err.strip(),
-        "command": f"./pipeline.sh '{user_inputs_dir}' '{req_user_id}' '{email}' '{name}'",
+        "command": f"./pipeline.sh '{user_inputs_dir}'",
         "jobs_submitted": jobs_submitted,
         "folders_processed": folders_processed
     }
-
 
 def stage_folders_and_start_pipeline(
     local_folder_paths: Dict[str, str],
@@ -295,23 +292,22 @@ def stage_folders_and_start_pipeline(
                 gef_probe_radius=gef_probe_radius
             )
             
-            # Save metadata for this folder
-            metadata = {
-                "user_id": req_user_id,
-                "email": email,
-                "name": name,
-                "organization": organization,
-                "description": description,
-                "number_of_runs": number_of_runs,
-                "gef_probe_radius": gef_probe_radius,
-                "uploaded_files": uploaded_files,
-                "timestamp": int(time.time()),
-                "folder": folder_name
-            }
-            
+            # Save metadata for this folder as metadata.txt (not JSON)
+            # This is needed for each individual folder
+            metadata_txt = f"""USER_ID={req_user_id}
+EMAIL={email}
+JOB_NAME={folder_name}
+NAME={name}
+ORGANIZATION={organization}
+DESCRIPTION={description}
+NUMBER_OF_RUNS={number_of_runs}
+GEF_PROBE_RADIUS={gef_probe_radius}
+TIMESTAMP={int(time.time())}
+"""
+
             metadata_path = posixpath.join(hpc_folder_path, "metadata.txt")
             with sftp.file(metadata_path, "w") as f:
-                f.write(json.dumps(metadata, indent=2))
+                f.write(metadata_txt)
             
             all_folders.append({
                 'folder_name': folder_name,
@@ -320,6 +316,26 @@ def stage_folders_and_start_pipeline(
             })
         
         print(f"\nDEBUG: Successfully uploaded {len(all_folders)} folder(s) to HPC")
+        
+        # Create metadata.txt in the parent user_inputs_dir
+        # This is what the pipeline.sh script looks for
+        user_metadata_txt = f"""USER_ID={req_user_id}
+EMAIL={email}
+JOB_NAME={req_user_id}_submission
+NAME={name}
+ORGANIZATION={organization}
+DESCRIPTION={description}
+NUMBER_OF_RUNS={number_of_runs}
+GEF_PROBE_RADIUS={gef_probe_radius}
+TIMESTAMP={int(time.time())}
+FOLDER_COUNT={len(all_folders)}
+"""
+
+        user_metadata_path = posixpath.join(paths["user_inputs_dir"], "metadata.txt")
+        with sftp.file(user_metadata_path, "w") as f:
+            f.write(user_metadata_txt)
+        
+        print(f"DEBUG: Created metadata.txt in {paths['user_inputs_dir']}")
         
         # Sync and verify before calling pipeline
         time.sleep(1)
@@ -337,11 +353,18 @@ def stage_folders_and_start_pipeline(
         pipeline_result = call_pipeline_script(
             ssh=ssh,
             user_inputs_dir=paths["user_inputs_dir"],
-            req_user_id=req_user_id,
-            email=email,
-            name=name
         )
-        
+
+        # Read Azure folder URL if it exists
+        azure_folder_url = None
+        azure_url_file = posixpath.join('/projects/SimBioSys/share/software/GlycoShield/logs', req_user_id, 'azure_folder_url.txt')
+        try:
+            with sftp.file(azure_url_file, 'r') as f:
+                azure_folder_url = f.read().decode().strip()
+                print(f"INFO: Retrieved Azure URL: {azure_folder_url}")
+        except Exception as e:
+            print(f"WARNING: Could not read Azure URL file: {e}")
+                
         # Build response
         ts = int(time.time())
         meta = {
@@ -359,7 +382,8 @@ def stage_folders_and_start_pipeline(
                 "name": name,
                 "organization": organization,
                 "description": description
-            }
+            },
+            "azure_folder_url": azure_folder_url
         }
         
         return meta

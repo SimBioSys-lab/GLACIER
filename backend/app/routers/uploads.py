@@ -112,4 +112,5 @@ async def upload(
         files=all_files,
         job_ids=[str(run_meta["pid"])],
         user_id=req_user_id,
+        azure_folder_url=run_meta.get("azure_folder_url"),
     )

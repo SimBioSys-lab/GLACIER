@@ -9,3 +9,4 @@ class UploadResponse(BaseModel):
     files: List[str]
     job_ids: List[str]
     user_id: str
+    azure_folder_url: Optional[str] = None
