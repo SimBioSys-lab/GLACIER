@@ -21,4 +21,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 EXPOSE 3000
 
 # 5. Start command (Dynamic Port)
-CMD ["sh", "-c", "gunicorn --bind 0.0.0.0:$PORT bot:flask_app"]
+CMD ["sh", "-c", "gunicorn --workers 1 --bind 0.0.0.0:$PORT bot:flask_app"]
