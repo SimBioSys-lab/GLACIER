@@ -1,7 +1,10 @@
 import { useState, useCallback } from 'react'
-import { FormData } from '@/components/form/StepTwo'
-import { DEFAULT_GEF_PROBE_RADIUS, DEFAULT_RUN_COUNT } from '@/app/config'
-import { FolderConfig, FileWithPath, FolderGroup } from '@/types/folderConfig'
+import type { FormData as IFormData } from '@/components/form/StepTwo'
+import type { FolderConfig, FileWithPath, FolderGroup } from '@/types/folderConfig'
+
+// Default values with fallbacks
+const DEFAULT_RUN_COUNT = 1
+const DEFAULT_GEF_PROBE_RADIUS = 3
 
 // Group files by folder and create folder configurations
 const groupFilesIntoFolders = (files: FileWithPath[]): FolderGroup[] => {
@@ -26,8 +29,8 @@ const groupFilesIntoFolders = (files: FileWithPath[]): FolderGroup[] => {
       files,
       config: {
         folderName: name,
-        numberOfRuns: DEFAULT_RUN_COUNT,
-        gefProbeRadius: DEFAULT_GEF_PROBE_RADIUS,
+        numberOfRuns: DEFAULT_RUN_COUNT || 1,  // Ensure default value
+        gefProbeRadius: DEFAULT_GEF_PROBE_RADIUS || 3,  // Ensure default value
         attachGaps: true,
         loadedFromInputDat: {}
       },
@@ -58,7 +61,7 @@ export const useFormState = () => {
   const [currentStep, setCurrentStep] = useState(1)
   const [files, setFiles] = useState<File[]>([])
   const [folderConfigs, setFolderConfigs] = useState<FolderGroup[]>([])
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<IFormData>({
     fullName: '',
     email: '',
     organization: '',

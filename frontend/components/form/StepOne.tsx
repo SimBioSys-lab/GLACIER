@@ -58,6 +58,11 @@ const FolderConfigPanel = ({
 }) => {
   const { config } = folder
   
+  // Ensure default values
+  const numberOfRuns = config.numberOfRuns || 1
+  const gefProbeRadius = config.gefProbeRadius || 3
+  const attachGaps = config.attachGaps !== undefined ? config.attachGaps : true
+  
   return (
     <div className="p-4 bg-[#F5F4F9]/50 border-t border-[#1A1A1A]/10 space-y-4">
       <h5 className="text-sm font-medium text-[#1A1A1A] flex items-center gap-2">
@@ -78,7 +83,7 @@ const FolderConfigPanel = ({
             type="number"
             min="1"
             max="1000"
-            value={config.numberOfRuns}
+            value={numberOfRuns}
             onChange={(e) => {
               const value = parseInt(e.target.value) || 1
               updateConfig({ 
@@ -105,7 +110,7 @@ const FolderConfigPanel = ({
             type="number"
             min="1"
             max="10"
-            value={config.gefProbeRadius}
+            value={gefProbeRadius}
             onChange={(e) => {
               const value = parseInt(e.target.value) || 3
               updateConfig({ 
@@ -133,7 +138,7 @@ const FolderConfigPanel = ({
               type="button"
               onClick={() => {
                 updateConfig({ 
-                  attachGaps: !config.attachGaps,
+                  attachGaps: !attachGaps,
                   loadedFromInputDat: {
                     ...config.loadedFromInputDat,
                     attachGaps: false
@@ -142,26 +147,26 @@ const FolderConfigPanel = ({
               }}
               className={`
                 relative inline-flex h-7 w-12 items-center rounded-full transition-colors duration-200 ease-in-out
-                ${config.attachGaps ? 'bg-[#8B7DFF]' : 'bg-[#1A1A1A]/20'}
+                ${attachGaps ? 'bg-[#8B7DFF]' : 'bg-[#1A1A1A]/20'}
               `}
-              aria-pressed={config.attachGaps}
+              aria-pressed={attachGaps}
             >
               <span
                 className={`
                   inline-block h-5 w-5 transform rounded-full bg-white transition duration-200 ease-in-out shadow
-                  ${config.attachGaps ? 'translate-x-6' : 'translate-x-1'}
+                  ${attachGaps ? 'translate-x-6' : 'translate-x-1'}
                 `}
               />
             </button>
-            <span className={`text-xs font-medium ${config.attachGaps ? 'text-green-600' : 'text-gray-500'}`}>
-              {config.attachGaps ? 'Enabled' : 'Disabled'}
+            <span className={`text-xs font-medium ${attachGaps ? 'text-green-600' : 'text-gray-500'}`}>
+              {attachGaps ? 'Enabled' : 'Disabled'}
             </span>
           </div>
         </div>
       </div>
       
       <div className="text-xs text-[#1A1A1A]/60 bg-white/50 p-2 rounded">
-        NRUNS={config.numberOfRuns} | GEF_PROBE_RADIUS={config.gefProbeRadius} | ATTACH_GAPS={config.attachGaps ? 'True' : 'False'}
+        NRUNS={numberOfRuns} | GEF_PROBE_RADIUS={gefProbeRadius} | ATTACH_GAPS={attachGaps ? 'True' : 'False'}
       </div>
     </div>
   )
@@ -352,8 +357,7 @@ export default function StepOne({
 
       {/* Example Data Banner */}
       {isExample && (
-        <div className="bg-gradient-to-r from-[#8B7DFF]/10 to-blue-500/10 border border-[#8B7DFF]/30 rounded-lg p-4 mb-6"
-        >
+        <div className="bg-gradient-to-r from-[#8B7DFF]/10 to-blue-500/10 border border-[#8B7DFF]/30 rounded-lg p-4 mb-6">
           <div className="flex items-center gap-3">
             <FlaskRound className="w-5 h-5 text-[#8B7DFF]" />
             <div className="flex-1 text-left">
@@ -400,7 +404,7 @@ export default function StepOne({
               Clear Example
             </Button>
           </div>
-          </div>
+        </div>
       )}
         <p className="text-[#1A1A1A]/70">
           Upload your research files and configure analysis parameters

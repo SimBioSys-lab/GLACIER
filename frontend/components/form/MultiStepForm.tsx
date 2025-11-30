@@ -10,11 +10,11 @@ import StepOne from "./StepOne"
 import StepTwo from "./StepTwo"
 import { useFormState } from "@/hooks/useFormState"
 import { useSubmissionStatus } from "@/hooks/useSubmissionStatus"
-import { SubmissionService } from "@/services/submissionService"
+import SubmissionService from "@/services/submissionService"
 
 interface MultiStepFormProps {
   showForm: boolean
-  onSubmitSuccess: (jobIds: string[]) => void
+  onSubmitSuccess: (jobIds: string[], azureUrl?: string) => void
   onSubmitError: (error: string) => void
 }
 
@@ -41,6 +41,11 @@ const MultiStepForm = forwardRef<HTMLDivElement, MultiStepFormProps>(
       setIsSubmitting(true)
       
       try {
+        // Ensure we have folder configs before submitting
+        if (folderConfigs.length === 0) {
+          throw new Error('No folders to process. Please upload files first.')
+        }
+        
         const response = await SubmissionService.submit({
           files,
           folderConfigs,
@@ -48,7 +53,9 @@ const MultiStepForm = forwardRef<HTMLDivElement, MultiStepFormProps>(
         })
         
         setIsSubmitting(false)
-        onSubmitSuccess(response.job_ids)
+        console.log('Submission response:', response)
+        console.log('Azure URL from response:', response.azure_folder_url)
+        onSubmitSuccess(response.job_ids, response.azure_folder_url)
         
         // Reset form after success
         setTimeout(() => {
@@ -125,9 +132,9 @@ const MultiStepForm = forwardRef<HTMLDivElement, MultiStepFormProps>(
                   ) : (
                     <Button
                       onClick={handleSubmit}
-                      disabled={isSubmitting || !canSubmit()}
+                      disabled={isSubmitting || folderConfigs.length === 0}
                       className="px-12 py-4 bg-[#1A1A1A] hover:bg-[#1A1A1A]/90 text-white rounded-lg font-medium transition-all duration-300 shadow-lg disabled:opacity-50"
-                      title={!canSubmit() ? "Please fill in all required fields with valid information (Full Name, valid Email, and Organization)" : ""}
+                      title={folderConfigs.length === 0 ? "Please go back and upload files first" : ""}
                     >
                       {isSubmitting ? "Submitting..." : isSubmitted ? "Form Successfully Submitted!" : "Submit"}
                     </Button>

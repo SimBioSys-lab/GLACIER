@@ -1,63 +1,112 @@
-import { UPLOAD_ENDPOINT } from '@/app/config'
-import { FormData as FormDataType } from '@/components/form/StepTwo'
+import type { IFormData } from '@/types/formTypes'
+import type { FolderGroup } from '@/types/folderConfig'
+import { API_URL } from '@/app/config'
 
-export interface SubmissionData {
+interface SubmissionData {
   files: File[]
-  numberOfRuns: number
-  GEFProbeRadius: number
-  formData: FormDataType
+  folderConfigs: FolderGroup[]
+  formData: IFormData
 }
 
-export interface SubmissionResponse {
+interface SubmissionResponse {
   job_ids: string[]
   message?: string
-}
-
-// Extended File type with webkitRelativePath
-interface FileWithPath extends File {
-  webkitRelativePath?: string;
+  azure_folder_url?: string
 }
 
 export class SubmissionService {
   static async submit(data: SubmissionData): Promise<SubmissionResponse> {
-    const formData = new FormData()
+    const formDataToSend = new FormData()
     
-    // Add files with their folder paths
-    data.files.forEach((file, index) => {
-      const fileWithPath = file as FileWithPath
-      const folderPath = fileWithPath.webkitRelativePath || ''
-      const folderName = folderPath ? folderPath.split('/')[0] : 'default'
-      
-      formData.append('files', file)
-      formData.append(`file_folders`, folderName)  // Send folder name for each file
+    // Build parallel arrays for files and their folder names
+    const allFiles: File[] = []
+    const fileFolders: string[] = []
+    
+    // Iterate through each folder and collect files with their folder names
+    data.folderConfigs.forEach(folder => {
+      folder.files.forEach(file => {
+        allFiles.push(file)
+        fileFolders.push(folder.name)
+      })
     })
     
-    // Add form fields
-    formData.append('name', data.formData.fullName)
-    formData.append('email', data.formData.email)
-    formData.append('organization', data.formData.organization)
-    formData.append('description', data.formData.description)
-    formData.append('numberOfRuns', data.numberOfRuns.toString())
-    formData.append('GEFProbeRadius', data.GEFProbeRadius.toString())
+    // Add all files to FormData
+    allFiles.forEach((file) => {
+      formDataToSend.append('files', file)
+    })
+    
+    // Add file_folders array - one folder name per file (required by backend)
+    fileFolders.forEach((folderName) => {
+      formDataToSend.append('file_folders', folderName)
+    })
+    
+    // Add form data - use 'name' instead of 'fullName' to match backend
+    formDataToSend.append('name', data.formData.fullName || '')
+    formDataToSend.append('email', data.formData.email || '')
+    formDataToSend.append('organization', data.formData.organization || '')
+    formDataToSend.append('description', data.formData.description || '')
+    
+    // For now, use the first folder's config for global parameters
+    // (Backend currently expects single values, not per-folder)
+    if (data.folderConfigs.length > 0) {
+      const firstConfig = data.folderConfigs[0].config
+      formDataToSend.append('numberOfRuns', (firstConfig.numberOfRuns || 1).toString())
+      formDataToSend.append('GEFProbeRadius', (firstConfig.gefProbeRadius || 3).toString())
+    } else {
+      // Fallback defaults
+      formDataToSend.append('numberOfRuns', '1')
+      formDataToSend.append('GEFProbeRadius', '3')
+    }
     
     try {
-      const response = await fetch(UPLOAD_ENDPOINT, {
+      const response = await fetch(`${API_URL}/upload`, {
         method: 'POST',
-        body: formData,
+        body: formDataToSend,
       })
       
       if (!response.ok) {
-        const errorText = await response.text()
-        throw new Error(`Server responded with ${response.status}: ${errorText}`)
+        const errorData = await response.json().catch(() => ({ 
+          detail: 'An error occurred during submission' 
+        }))
+        
+        // Better error message formatting
+        let errorMessage = 'An error occurred during submission'
+        if (errorData.detail) {
+          if (Array.isArray(errorData.detail)) {
+            // FastAPI validation errors are arrays of objects
+            errorMessage = errorData.detail.map((err: any) => 
+              `${err.loc?.join('.') || 'Field'}: ${err.msg}`
+            ).join(', ')
+          } else if (typeof errorData.detail === 'string') {
+            errorMessage = errorData.detail
+          } else if (typeof errorData.detail === 'object') {
+            errorMessage = JSON.stringify(errorData.detail)
+          }
+        }
+        
+        throw new Error(errorMessage)
       }
       
-      const responseData: SubmissionResponse = await response.json()
-      return responseData
-    } catch (error: any) {
-      if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-        throw new Error('Connection to the server failed. Please ensure the backend server is running on port 8000.')
+      const result = await response.json()
+      console.log('Raw backend response:', result)
+      console.log('Azure URL in response:', result.azure_folder_url)
+      
+      // Create return value
+      const returnValue = {
+        job_ids: result.job_ids || [result.job_id] || [],
+        azure_folder_url: result.azure_folder_url
       }
-      throw error
+      
+      console.log('Returning from SubmissionService:', returnValue)
+      
+      return returnValue
+    } catch (error) {
+      if (error instanceof Error) {
+        throw error
+      }
+      throw new Error('Failed to submit form')
     }
   }
 }
+
+export default SubmissionService

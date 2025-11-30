@@ -1,5 +1,5 @@
 /**
- * Example Data Service for GlycoShield
+ * Example Data Service for GLACIER
  * Provides example files for demonstration purposes
  */
 
@@ -15,13 +15,15 @@ const EXAMPLE_FILES = {
 export const EXAMPLE_DATA = {
   name: 'Spike Protein D614G',
   description: 'SARS-CoV-2 spike protein glycosylation analysis example',
+  // These values are not used anymore since we use per-folder configs
+  // But keeping them for backward compatibility
   numberOfRuns: 1,
   GEFProbeRadius: 3,
   formData: {
     fullName: '',
     email: '',
     organization: 'SimBioSys Lab Demo',
-    description: 'This is an example run demonstrating the GlycoShield processing pipeline'
+    description: 'This is an example run demonstrating the GLACIER processing pipeline'
   }
 }
 
@@ -48,8 +50,6 @@ async function fetchFileAsBlob(url: string, filename: string): Promise<File> {
  */
 export async function loadExampleFiles(): Promise<{
   files: File[]
-  numberOfRuns: number
-  GEFProbeRadius: number
   formData: typeof EXAMPLE_DATA.formData
 }> {
   try {
@@ -79,7 +79,7 @@ export async function loadExampleFiles(): Promise<{
         enumerable: false
       })
       
-      // Also add webkitRelativePath using defineProperty if possible
+      // Also try to add webkitRelativePath using defineProperty if possible
       try {
         Object.defineProperty(fileWithPath, 'webkitRelativePath', {
           value: `spikeD/${file.name}`,
@@ -96,8 +96,6 @@ export async function loadExampleFiles(): Promise<{
     
     return {
       files: filesWithPath,
-      numberOfRuns: EXAMPLE_DATA.numberOfRuns,
-      GEFProbeRadius: EXAMPLE_DATA.GEFProbeRadius,
       formData: EXAMPLE_DATA.formData
     }
   } catch (error) {
