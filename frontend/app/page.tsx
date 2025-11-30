@@ -3,7 +3,6 @@
 import React, { useState, useRef, useEffect } from "react"
 import Header from "@/components/layout/Header"
 import Footer from "@/components/layout/Footer"
-import HeroSection from "@/components/hero/HeroSection"
 import VideoHeroSection from "@/components/hero/VideoHeroSection"
 import MultiStepForm from "@/components/form/MultiStepForm"
 import CitationSection from "@/components/citation/CitationSection"
@@ -15,6 +14,7 @@ export default function CicadaSimBioSysInterface() {
   const [submitError, setSubmitError] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const [jobIds, setJobIds] = useState<string[]>([])
+  const [azureUrl, setAzureUrl] = useState<string>()
   const [isSubmitted, setIsSubmitted] = useState(false)
   const formSectionRef = useRef<HTMLDivElement>(null)
 
@@ -36,16 +36,12 @@ export default function CicadaSimBioSysInterface() {
     formSectionRef.current?.scrollIntoView({ behavior: "smooth" })
   }
 
-  const handleSubmitSuccess = (newJobIds: string[]) => {
+  const handleSubmitSuccess = (newJobIds: string[], azureUrl?: string) => {
     setJobIds(newJobIds)
+    console.log('Setting Azure URL in page.tsx:', azureUrl)
+    setAzureUrl(azureUrl)
     setIsSubmitted(true)
     setSubmitError(false)
-    
-    // Clear success message after delay
-    setTimeout(() => {
-      setIsSubmitted(false)
-      setJobIds([])
-    }, 5000)
   }
 
   const handleSubmitError = (error: string) => {
@@ -84,12 +80,19 @@ export default function CicadaSimBioSysInterface() {
         </div>
 
         {/* Status Messages */}
-        <SubmissionStatus 
-          isSubmitted={isSubmitted} 
-          isError={submitError} 
-          errorMessage={errorMessage} 
-          jobIds={jobIds} 
-        />
+          <SubmissionStatus
+            isSubmitted={isSubmitted}
+            isError={submitError}
+            errorMessage={errorMessage}
+            jobIds={jobIds}
+            azureUrl={azureUrl}
+            onClose={() => {
+              setIsSubmitted(false)
+              setSubmitError(false)
+              setJobIds([])
+              setAzureUrl(undefined)
+            }}
+          />
 
         {/* Footer Section */}
         <Footer />
@@ -100,3 +103,4 @@ export default function CicadaSimBioSysInterface() {
     </div>
   )
 }
+
