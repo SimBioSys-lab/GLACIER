@@ -1,8 +1,7 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import GlassSurface from '../GlassSurface'
+import React, { useState } from "react"
+import SimplifiedGlassSurface from '../SimplifiedGlassSurface'
 
 interface HeaderProps {
   onScrollToForm: () => void
@@ -14,30 +13,18 @@ export default function Header({ onScrollToForm }: HeaderProps) {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 pointer-events-none">
       <div className="flex justify-center pt-6 px-4">
-        <GlassSurface
-          displace={0.5}
-          distortionScale={-180}
-          redOffset={0}
-          greenOffset={10}
-          blueOffset={20}
-          brightness={100}
-          opacity={0.6}
-          backgroundOpacity={0}
-          saturation={1}
-          blur={12}
-          mixBlendMode="screen"
+        <SimplifiedGlassSurface
           borderRadius={50}
-          borderWidth={0.07}
-          width="85%" 
-          height="auto"
-          className="pointer-events-auto max-w-7xl"
+          blur={10}
+          opacity={0.5}
+          className="pointer-events-auto max-w-7xl w-[85%]"
         >
           {/* Reduced padding (py-2) for a slimmer look */}
-          <div className="grid grid-cols-3 items-center px-8 py-2">
+          <div className="grid grid-cols-3 items-center px-8 py-2 w-full">
             
             {/* LEFT: Anchor Text */}
             <div className="flex justify-start">
-               <div className="flex flex-col leading-none"> {/* leading-none tightens vertical space */}
+               <div className="flex flex-col leading-none">
                   <span className="text-[9px] uppercase tracking-[0.15em] text-black/40 font-sans font-semibold mb-1">
                     Initiative By
                   </span>
@@ -49,47 +36,35 @@ export default function Header({ onScrollToForm }: HeaderProps) {
 
             {/* CENTER: The Hero Interaction */}
             <div className="flex justify-center">
-              <motion.div 
+              <div 
                 className="relative flex flex-col items-center justify-center cursor-pointer min-w-[300px]"
-                onHoverStart={() => setIsHovered(true)}
-                onHoverEnd={() => setIsHovered(false)}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
               >
-                <AnimatePresence mode="wait">
+                <div className="text-center relative">
                   {isHovered ? (
-                    <motion.div
-                      key="full"
-                      initial={{ opacity: 0, scale: 0.95, filter: "blur(4px)" }}
-                      animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-                      exit={{ opacity: 0, scale: 0.95, filter: "blur(4px)" }}
-                      transition={{ duration: 0.3, ease: "easeOut" }}
-                      className="text-center absolute w-[200%]" 
+                    <h5 
+                      className="text-l font-mono text-black/70 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap transition-opacity duration-300"
+                      style={{ 
+                        fontFamily: 'var(--font-nothing), monospace',
+                        opacity: isHovered ? 1 : 0
+                      }}
                     >
-                      <h5 
-                        className="text-l font-mono text-black/70" 
-                        style={{ fontFamily: 'var(--font-nothing), monospace' }}
-                      >
-                        Glycan Accessibility Computational Infrastructure for Ensemble Research
-                      </h5>
-                    </motion.div>
+                      Glycan Accessibility Computational Infrastructure for Ensemble Research
+                    </h5>
                   ) : (
-                    <motion.div
-                      key="short"
-                      initial={{ opacity: 0, scale: 0.95, filter: "blur(4px)" }}
-                      animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-                      exit={{ opacity: 0, scale: 0.95, filter: "blur(4px)" }}
-                      transition={{ duration: 0.3, ease: "easeOut" }}
-                      className="text-center"
+                    <h1 
+                      className="text-xl font-mono text-black transition-opacity duration-300" 
+                      style={{ 
+                        fontFamily: 'var(--font-nothing), monospace',
+                        opacity: isHovered ? 0 : 1
+                      }}
                     >
-                      <h1 
-                        className="text-xl font-mono text-black" 
-                        style={{ fontFamily: 'var(--font-nothing), monospace' }}
-                      >
-                        GLACIER
-                      </h1>
-                    </motion.div>
+                      GLACIER
+                    </h1>
                   )}
-                </AnimatePresence>
-              </motion.div>
+                </div>
+              </div>
             </div>
 
             {/* RIGHT: Empty div to balance the grid (Keeps GLACIER centered) */}
@@ -98,7 +73,7 @@ export default function Header({ onScrollToForm }: HeaderProps) {
             </div>
 
           </div>
-        </GlassSurface>
+        </SimplifiedGlassSurface>
       </div>
     </header>
   )

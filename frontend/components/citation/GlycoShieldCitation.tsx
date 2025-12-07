@@ -1,48 +1,36 @@
 "use client"
 
 import React, { useState } from "react"
-import { Copy, Download, Check, BookOpen, FileText, GraduationCap, Sparkles } from "lucide-react"
+import { Copy, Download, Check, BookOpen, FileText, Sparkles } from "lucide-react"
 
-type CitationFormat = "bibtex" | "endnote" | "apa" | "mla"
+type CitationFormat = "bibtex" | "apa"
 
 interface CitationData {
   bibtex: string
-  endnote: string
   apa: string
-  mla: string
 }
 
-export default function CitationSection() {
+export default function GlycoShieldCitation() {
   const [selectedFormat, setSelectedFormat] = useState<CitationFormat>("bibtex")
   const [copiedFormat, setCopiedFormat] = useState<CitationFormat | null>(null)
   const [downloadedFormat, setDownloadedFormat] = useState<CitationFormat | null>(null)
 
-  // Citation data for different formats
+  // Citation data for GlycoShield analysis
   const citations: CitationData = {
-    bibtex: `@software{glacier2025,
-  title = {{GLACIER: A comprehensive platform for ensemble-based geometric exposure analysis of glycosylated proteins}},
+    bibtex: `@software{glycoshield2025,
+  title = {{GlycoShield Analysis via GLACIER Platform}},
   author = {{SimBioSys Lab}},
   organization = {Northeastern University},
   year = {2025},
-  url = {https://glacier.simbiosys.org},
-  note = {Version 1.0}
+  url = {https://glacier.simbiosys.org/glycoshield},
+  note = {Ensemble-based geometric exposure analysis}
 }`,
-    endnote: `%0 Computer Program
-%T GLACIER: A comprehensive platform for ensemble-based geometric exposure analysis of glycosylated proteins
-%A SimBioSys Lab
-%I Northeastern University
-%D 2025
-%U https://glacier.simbiosys.org
-%Z Version 1.0`,
-    apa: `SimBioSys Lab. (2025). GLACIER: A comprehensive platform for ensemble-based geometric exposure analysis of glycosylated proteins (Version 1.0) [Computer software]. Northeastern University. https://glacier.simbiosys.org`,
-    mla: `SimBioSys Lab. "GLACIER: A comprehensive platform for ensemble-based geometric exposure analysis of glycosylated proteins." Version 1.0, Northeastern University, 2025, glacier.simbiosys.org.`
+    apa: `SimBioSys Lab. (2025). GlycoShield Analysis via GLACIER Platform [Computer software]. Northeastern University. https://glacier.simbiosys.org/glycoshield`
   }
 
   const formatLabels = {
     bibtex: { label: "BibTeX", icon: FileText },
-    endnote: { label: "EndNote", icon: BookOpen },
-    apa: { label: "APA", icon: GraduationCap },
-    mla: { label: "MLA", icon: GraduationCap }
+    apa: { label: "APA", icon: BookOpen }
   }
 
   const handleCopy = async (format: CitationFormat) => {
@@ -61,7 +49,7 @@ export default function CitationSection() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `glacier_citation.${format === 'bibtex' ? 'bib' : format === 'endnote' ? 'enw' : 'txt'}`
+    a.download = `glycoshield_citation.${format === 'bibtex' ? 'bib' : 'txt'}`
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
@@ -92,17 +80,19 @@ export default function CitationSection() {
               className="text-3xl md:text-4xl font-light text-[#1A1A1A] mb-6"
               style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}
             >
-              Cite GLACIER
+              Cite This Analysis
             </h2>
             
             <p className="text-lg text-[#1A1A1A]/70 max-w-2xl mx-auto" style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}>
-              If you use GLACIER in your research, please cite our work to help others discover and build upon this platform.
+              If you use GlycoShield analysis in your research, please cite GLACIER.
             </p>
           </div>
 
           {/* Format Selector - Simplified */}
           <div className="flex justify-center mb-8">
-            <div className="inline-flex p-2 rounded-xl bg-white/60 backdrop-blur-sm border border-[#1A1A1A]/10 shadow-sm">
+            <div 
+              className="inline-flex p-2 rounded-xl bg-white/60 backdrop-blur-sm border border-[#1A1A1A]/10 shadow-sm"
+            >
               <div className="flex gap-1 items-center">
                 {(Object.keys(citations) as CitationFormat[]).map((format) => {
                   const Icon = formatLabels[format].icon
@@ -111,8 +101,8 @@ export default function CitationSection() {
                       key={format}
                       onClick={() => setSelectedFormat(format)}
                       className={`
-                        px-4 py-3 rounded-lg font-semibold text-sm transition-colors duration-150
-                        flex items-center gap-2
+                        px-6 py-3 rounded-lg font-semibold text-sm transition-colors duration-150
+                        flex items-center justify-center gap-2 w-[120px]
                         ${selectedFormat === format 
                           ? 'bg-[#8B7DFF] text-white shadow-md' 
                           : 'text-[#1A1A1A]/70 hover:text-[#1A1A1A] hover:bg-white/80'
@@ -131,7 +121,9 @@ export default function CitationSection() {
 
           {/* Citation Display - Simplified */}
           <div>
-            <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-[#1A1A1A]/10 shadow-lg p-8 md:p-10">
+            <div 
+              className="bg-white/70 backdrop-blur-sm rounded-2xl border border-[#1A1A1A]/10 shadow-lg p-8 md:p-10"
+            >
               {/* Citation Text */}
               <div className="bg-white/60 rounded-lg p-8 mb-6 overflow-x-auto border border-[#1A1A1A]/5">
                 <pre className="whitespace-pre-wrap text-[#1A1A1A]/90 font-mono text-sm" style={{ lineHeight: '1.8' }}>
@@ -183,7 +175,7 @@ export default function CitationSection() {
                     <div className="flex items-center gap-2">
                       <Download className="w-4 h-4" />
                       <span>
-                        Download .{selectedFormat === 'bibtex' ? 'bib' : selectedFormat === 'endnote' ? 'enw' : 'txt'}
+                        Download .{selectedFormat === 'bibtex' ? 'bib' : 'txt'}
                       </span>
                     </div>
                   )}
@@ -199,38 +191,6 @@ export default function CitationSection() {
                   </a>
                 </p>
               </div>
-            </div>
-          </div>
-
-          {/* Related Publications */}
-          <div className="mt-12 text-center">
-            <p className="text-sm text-[#1A1A1A]/60 mb-3" style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}>
-              See also our related publications:
-            </p>
-            <div className="flex flex-wrap gap-3 justify-center">
-              <a
-                href="#"
-                className="text-sm text-[#8B7DFF] hover:text-[#7B6DFF] hover:underline underline-offset-4 transition-colors font-medium"
-                style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}
-              >
-                Ensemble-based protein analysis (2024)
-              </a>
-              <span className="text-[#1A1A1A]/30">•</span>
-              <a
-                href="#"
-                className="text-sm text-[#8B7DFF] hover:text-[#7B6DFF] hover:underline underline-offset-4 transition-colors font-medium"
-                style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}
-              >
-                GEF methodology paper (2024)
-              </a>
-              <span className="text-[#1A1A1A]/30">•</span>
-              <a
-                href="#"
-                className="text-sm text-[#8B7DFF] hover:text-[#7B6DFF] hover:underline underline-offset-4 transition-colors font-medium"
-                style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}
-              >
-                Glycan shield dynamics (2023)
-              </a>
             </div>
           </div>
         </div>
