@@ -14,7 +14,15 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// Load Nothing Font 5x7
+// Load VT323 Font
+const vt323Font = localFont({
+  src: "../public/fonts/VT323-Regular.ttf",
+  variable: "--font-vt323",
+  weight: "400",
+  display: "swap",
+});
+
+// Load Nothing Font 5x7 (keeping for backwards compatibility)
 const nothingFont = localFont({
   src: "../public/fonts/nothing-font-5x7.otf",
   variable: "--font-nothing",
@@ -33,7 +41,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${nothingFont.variable}`}>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${vt323Font.variable} ${nothingFont.variable}`}>
       <body
         className={`${geistSans.className} antialiased`}
       >

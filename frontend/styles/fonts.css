@@ -1,4 +1,47 @@
-/* Font utility classes */
+/* VT323 Font - Primary retro terminal font */
+@font-face {
+  font-family: 'VT323';
+  src: url('/fonts/VT323-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+.font-vt323 {
+  font-family: 'VT323', 'Courier New', monospace !important;
+}
+
+.text-vt323-lg {
+  font-family: 'VT323', 'Courier New', monospace !important;
+  font-size: 1.25rem !important;
+  line-height: 1.75rem !important;
+}
+
+.text-vt323-xl {
+  font-family: 'VT323', 'Courier New', monospace !important;
+  font-size: 1.5rem !important;
+  line-height: 2rem !important;
+}
+
+.text-vt323-2xl {
+  font-family: 'VT323', 'Courier New', monospace !important;
+  font-size: 1.875rem !important;
+  line-height: 2.25rem !important;
+}
+
+.text-vt323-3xl {
+  font-family: 'VT323', 'Courier New', monospace !important;
+  font-size: 2.25rem !important;
+  line-height: 2.5rem !important;
+}
+
+.text-vt323-4xl {
+  font-family: 'VT323', 'Courier New', monospace !important;
+  font-size: 2.5rem !important;
+  line-height: 2.75rem !important;
+}
+
+/* Font utility classes - Nothing Font 5x7 */
 .font-5x7 {
   font-family: 'Nothing Font 5x7', system-ui, -apple-system, sans-serif !important;
 }

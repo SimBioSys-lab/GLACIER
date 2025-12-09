@@ -3,14 +3,30 @@
 import React, { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import SimplifiedGlassSurface from '../SimplifiedGlassSurface'
-import { ChevronLeft, ChevronRight } from "lucide-react"
 
 export default function VideoHeroSection() {
   const [videoLoaded, setVideoLoaded] = useState(false)
   const [currentSlide, setCurrentSlide] = useState(0)
   const videoRef = React.useRef<HTMLVideoElement>(null)
   const router = useRouter()
-  const totalSlides = 2 // Number of cards
+
+  // Tool options
+  const tools = [
+    {
+      id: 0,
+      name: "GlycoShield",
+      icon: "circle",
+      color: "#8B7DFF",
+      route: "/glycoshield"
+    },
+    {
+      id: 1,
+      name: "VASCO",
+      icon: "lightning",
+      color: "#FF6B9D",
+      route: "/paratope"
+    }
+  ]
 
   // Set video playback speed
   useEffect(() => {
@@ -19,33 +35,16 @@ export default function VideoHeroSection() {
     }
   }, [videoLoaded])
 
-  // Auto-slide every 8 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % totalSlides)
-    }, 8000)
-
-    return () => clearInterval(interval)
-  }, [])
-
-  const goToSlide = (index: number) => {
-    setCurrentSlide(index)
-  }
-
-  const goToPrevious = () => {
-    setCurrentSlide((prev) => (prev - 1 + totalSlides) % totalSlides)
-  }
-
-  const goToNext = () => {
-    setCurrentSlide((prev) => (prev + 1) % totalSlides)
-  }
-
-  const handleStartAnalysis = () => {
-    router.push('/glycoshield')
-  }
-
   const scrollToCitation = () => {
     document.getElementById('citation')?.scrollIntoView({ behavior: "smooth" })
+  }
+
+  const handleToolSelect = (toolId: number) => {
+    setCurrentSlide(toolId)
+  }
+
+  const handleStart = () => {
+    router.push(tools[currentSlide].route)
   }
 
   return (
@@ -58,6 +57,7 @@ export default function VideoHeroSection() {
           autoPlay
           muted
           playsInline
+          loop={false}
           onLoadedData={() => setVideoLoaded(true)}
         >
           <source 
@@ -68,22 +68,18 @@ export default function VideoHeroSection() {
         </video>
       </div>
 
-      {/* Vignette + right-side emphasis fade (keeps text legible on top) */}
+      {/* Vignette + right-side emphasis fade */}
       <div className="pointer-events-none absolute inset-0 z-[1]">
-        {/* soft global vignette */}
         <div className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-black/10" />
-        {/* right-to-left fade so left glass card pops more */}
         <div className="absolute inset-0 lg:bg-gradient-to-l lg:from-white/30 lg:via-white/10 lg:to-transparent" />
       </div>
 
-      {/* Hero Content (glassmorphic left panel stacked on top of scene) */}
+      {/* Hero Content */}
       <div className="relative z-10 container mx-auto ml-[10vw] px-6 pt-28 md:pt-36 pb-16">
         <div className="min-h-[calc(100vh-10rem)] flex items-start md:items-center">
-          {/* Carousel Container */}
-          <div className="max-w-xl w-full relative">
-            {/* Card Display */}
+          <div className="max-w-2xl w-full relative">
             <div 
-              className="opacity-0 animate-fadeIn relative" 
+              className="opacity-0 animate-fadeIn" 
               style={{ animationDelay: videoLoaded ? '0ms' : '300ms', animationFillMode: 'forwards' }}
             >
               <SimplifiedGlassSurface
@@ -93,79 +89,162 @@ export default function VideoHeroSection() {
                 className="w-full"
               >
                 <div className="p-6 md:p-8 w-full">
-                  {/* Small logo/branding */}
-                  <div className="mb-6 flex items-center gap-2">
-                    <div className="w-8 h-8 bg-gradient-to-br from-[#8B7DFF] to-[#A594FF] rounded-lg flex items-center justify-center shadow-lg">
-                      <div className="w-3 h-3 bg-white rounded-full opacity-90" />
+                  {/* Segmented Control - Tabs at top */}
+                  <div className="mb-8">
+                    <div className="inline-flex p-1 rounded-full bg-white/40 backdrop-blur-sm border border-black/10 shadow-sm">
+                      {tools.map((tool) => (
+                        <button
+                          key={tool.id}
+                          onClick={() => handleToolSelect(tool.id)}
+                          className={`
+                            px-6 py-2.5 rounded-full font-semibold text-sm transition-all duration-300
+                            flex items-center gap-2
+                            ${currentSlide === tool.id
+                              ? 'bg-white text-black shadow-md scale-105'
+                              : 'text-black/60 hover:text-black/80 hover:bg-white/30'
+                            }
+                          `}
+                          style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}
+                        >
+                          {/* Icon */}
+                          {tool.icon === 'circle' ? (
+                            <div 
+                              className="w-2 h-2 rounded-full" 
+                              style={{ backgroundColor: currentSlide === tool.id ? tool.color : 'currentColor' }}
+                            />
+                          ) : (
+                            <svg 
+                              className="w-3.5 h-3.5" 
+                              fill="none" 
+                              viewBox="0 0 24 24" 
+                              stroke="currentColor"
+                              style={{ color: currentSlide === tool.id ? tool.color : 'currentColor' }}
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                          )}
+                          <span>{tool.name}</span>
+                        </button>
+                      ))}
                     </div>
                   </div>
 
-                  {/* Headline */}
-                  <h1
-                    className="text-2xl md:text-3xl xl:text-4xl font-light leading-[1.1] mb-6 tracking-[0.015em] max-w-[20ch] font-mono text-black/70"
-                    style={{ fontFamily: 'var(--font-nothing), monospace' }}
-                  >
-                    Our mission is to decode
-                    <br />
-                    <span className="font-normal text-[#8B7DFF]">Glycan Shielding</span>
-                    <br />
-                    on viral proteins.
-                  </h1>
-
-                  {/* Subheadline - Static text, no typewriter */}
-                  <div className="mb-10 max-w-lg">
-                    <p className="text-base md:text-lg font-mono text-black/70 leading-relaxed">
-                      At SimBioSys, we believe understanding protein glycosylation shouldn't require supercomputing expertise. <span className="font-medium">Democratizing structural biology through accessible computational tools that reveal</span> how glycans shield and expose protein surfaces.
-                    </p>
-                  </div>
-
-                  {/* CTAs */}
-                  <div className="flex items-center gap-4 flex-wrap">
-                    <button
-                      onClick={handleStartAnalysis}
-                      className="bg-[#8B7DFF] hover:bg-[#7B6DFF] text-white px-8 py-4 rounded-lg font-medium font-mono transition-colors duration-150 shadow-lg hover:shadow-xl"
+                  {/* Content Container - Reduced height for more compact design */}
+                  <div className="relative min-h-[420px]">
+                    {/* Slide 1: GlycoShield */}
+                    <div 
+                      className={`absolute inset-0 transition-opacity duration-500 ${
+                        currentSlide === 0 ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+                      }`}
                     >
-                      Start Analysis
-                    </button>
+                      <div className="flex flex-col h-full">
+                        {/* Headline */}
+                        <h1 className="text-2xl md:text-3xl xl:text-4xl font-normal leading-[1.05] mb-3 tracking-[0.015em] text-black/70" style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}>
+                          Decode
+                          <br />
+                          <span className="font-vt323 text-[#8B7DFF] text-5xl">GLYCAN SHIELDING</span>
+                          <br />
+                          on viral proteins.
+                        </h1>
 
-                    <a
-                      href="#citation"
-                      onClick={(e) => {
-                        e.preventDefault()
-                        scrollToCitation()
-                      }}
-                      className="text-[#8B7DFF] hover:text-[#7B6DFF] font-medium px-4 py-4 transition-colors duration-150 hover:underline underline-offset-4"
+                        {/* Subheadline */}
+                        <div className="mb-6 max-w-lg">
+                          <p className="text-base text-black/70 leading-relaxed" style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}>
+                            Understanding protein glycosylation shouldn't require supercomputing expertise. <span className="font-medium">Democratizing structural biology</span> through accessible computational tools.
+                          </p>
+                        </div>
+
+                        {/* CTAs */}
+                        <div className="flex items-center gap-4 flex-wrap mt-auto">
+                          <button
+                            onClick={handleStart}
+                            className="bg-[#8B7DFF] hover:bg-[#7B6DFF] text-white px-8 py-4 rounded-lg font-medium transition-colors duration-150 shadow-lg hover:shadow-xl"
+                            style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}
+                          >
+                            Start GlycoShield Analysis
+                          </button>
+
+                          <a
+                            href="#citation"
+                            onClick={(e) => {
+                              e.preventDefault()
+                              scrollToCitation()
+                            }}
+                            className="text-[#8B7DFF] hover:text-[#7B6DFF] font-medium px-4 py-4 transition-colors duration-150 hover:underline underline-offset-4"
+                            style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}
+                          >
+                            Learn more
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Slide 2: Paratope Prediction */}
+                    <div 
+                      className={`absolute inset-0 transition-opacity duration-500 ${
+                        currentSlide === 1 ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+                      }`}
                     >
-                      Learn more
-                    </a>
+                      <div className="flex flex-col h-full">
+                        {/* Headline */}
+                        <h1 className="text-2xl md:text-3xl xl:text-4xl font-normal leading-[1.05] mb-3 tracking-[0.015em] text-black/70" style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}>
+                          Predict
+                          <br />
+                          <span className="font-vt323 text-[#FF6B9D] text-4xl">ANTIBODY INTERFACES</span>
+                          <br />
+                          with AI precision.
+                        </h1>
+
+                        {/* Subheadline */}
+                        <div className="mb-4 max-w-lg">
+                          <p className="text-base text-black/70 leading-relaxed" style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}>
+                            Identify antibody-antigen binding sites with <span className="font-medium">deep learning</span>. MSA-powered neural networks analyze evolutionary patterns and 3D structure for state-of-the-art predictions.
+                          </p>
+                        </div>
+
+                        {/* Key Features */}
+                        <div className="mb-4 space-y-1">
+                          <div className="flex items-center gap-2 text-sm text-black/60" style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}>
+                            <div className="w-1.5 h-1.5 bg-[#FF6B9D] rounded-full flex-shrink-0" />
+                            <span>MSA-based evolutionary analysis</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm text-black/60" style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}>
+                            <div className="w-1.5 h-1.5 bg-[#FF6B9D] rounded-full flex-shrink-0" />
+                            <span>Graph neural network predictions</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm text-black/60" style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}>
+                            <div className="w-1.5 h-1.5 bg-[#FF6B9D] rounded-full flex-shrink-0" />
+                            <span>Per-residue confidence scores</span>
+                          </div>
+                        </div>
+
+                        {/* CTAs */}
+                        <div className="flex items-center gap-4 flex-wrap mt-auto">
+                          <button
+                            onClick={handleStart}
+                            className="bg-gradient-to-r from-[#FF6B9D] to-[#C44569] hover:from-[#FF5B8D] hover:to-[#B43559] text-white px-8 py-4 rounded-lg font-medium transition-all duration-150 shadow-lg hover:shadow-xl"
+                            style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}
+                          >
+                            Predict VASCO
+                          </button>
+
+                          <a
+                            href="#citation"
+                            onClick={(e) => {
+                              e.preventDefault()
+                              scrollToCitation()
+                            }}
+                            className="text-[#FF6B9D] hover:text-[#C44569] font-medium px-4 py-4 transition-colors duration-150 hover:underline underline-offset-4"
+                            style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}
+                          >
+                            Learn more
+                          </a>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </SimplifiedGlassSurface>
-            </div>
-
-            {/* Navigation Arrow - Right only */}
-            <button
-              onClick={goToNext}
-              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-16 bg-white/80 backdrop-blur-sm hover:bg-white p-3 rounded-full shadow-lg transition-all duration-150 hover:scale-110 z-20"
-              aria-label="Next slide"
-            >
-              <ChevronRight className="w-6 h-6 text-[#8B7DFF]" />
-            </button>
-
-            {/* Dots Indicator */}
-            <div className="flex justify-center gap-2 mt-6">
-              {Array.from({ length: totalSlides }).map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => goToSlide(index)}
-                  className={`transition-all duration-300 ${
-                    index === currentSlide 
-                      ? 'bg-[#8B7DFF] w-8 h-2 rounded-full' 
-                      : 'bg-white/50 hover:bg-white/80 w-2 h-2 rounded-full'
-                  }`}
-                  aria-label={`Go to slide ${index + 1}`}
-                />
-              ))}
             </div>
           </div>
         </div>
