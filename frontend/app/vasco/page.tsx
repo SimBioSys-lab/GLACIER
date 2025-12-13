@@ -6,6 +6,7 @@ import Footer from "@/components/layout/Footer"
 import ParatopeMultiStepForm from "@/components/paratope-form/ParatopeMultiStepForm"
 import ParatopeCitation from "@/components/citation/ParatopeCitation"
 import { ParatopeSubmissionStatus } from "@/components/paratope-submission-status"
+import { VascoCarousel } from "@/components/carousel"
 
 export default function VascoPage() {
   const [submitError, setSubmitError] = useState(false)
@@ -50,6 +51,9 @@ export default function VascoPage() {
 
       {/* Main Content Container with top spacing */}
       <main className="relative pt-32">
+        {/* Carousel Section */}
+        <VascoCarousel />
+
         {/* Multi-Step Form Section */}
         <ParatopeMultiStepForm 
           ref={formSectionRef}
