@@ -1,0 +1,195 @@
+"""
+VASCO HPC Service
+
+Handles HPC integration for VASCO (Viral Antibody Structural Complex Analysis).
+Uploads files to HPC and submits SLURM jobs for paratope prediction.
+"""
+import os
+import time
+import posixpath
+import paramiko
+from typing import Dict, Optional
+
+from app.config import settings
+from app.logging_config import setup_logging
+
+logger = setup_logging()
+
+# VASCO pipeline location on HPC
+VASCO_PIPELINE = "/projects/SimBioSys/share/software/VASCO"
+
+
+def _connect():
+    """Establish SSH connection to HPC"""
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+    pkey = None
+    
+    # Try to load SSH key if specified
+    key_path = getattr(settings, "HPC_SSH_KEY", "") or ""
+    
+    if key_path and key_path.strip():
+        key_path = os.path.expanduser(key_path)
+        if os.name == "nt":
+            key_path = os.path.normpath(key_path)
+        
+        if os.isfile(key_path):
+            passphrase = getattr(settings, "HPC_SSH_PASSPHRASE", None)
+            try:
+                pkey = paramiko.Ed25519Key.from_private_key_file(key_path, password=passphrase)
+            except paramiko.PasswordRequiredException:
+                raise RuntimeError("Key is passphrase-protected: set HPC_SSH_PASSPHRASE")
+            except paramiko.SSHException:
+                try:
+                    pkey = paramiko.RSAKey.from_private_key_file(key_path, password=passphrase)
+                except Exception as e:
+                    raise RuntimeError(f"Failed to load SSH key from {key_path}: {e}")
+
+    # Connect
+    ssh.connect(
+        hostname=settings.HPC_HOST,
+        port=settings.HPC_PORT,
+        username=settings.HPC_USER,
+        pkey=pkey,
+        password=getattr(settings, "HPC_PASSWORD", None),
+        look_for_keys=(pkey is None),
+        allow_agent=(pkey is None),
+        timeout=20,
+    )
+    sftp = ssh.open_sftp()
+    return ssh, sftp
+
+
+def submit_vasco_job(
+    user_id: str,
+    local_antibody_path: str,
+    local_antigen_path: str,
+    light_chain: str,
+    heavy_chain: str,
+    antigen_chains: str,
+    email: str,
+    name: str
+) -> Dict[str, str]:
+    """
+    Upload files to HPC and submit VASCO prediction job.
+    
+    Args:
+        user_id: Unique user identifier
+        local_antibody_path: Path to local antibody PDB file
+        local_antigen_path: Path to local antigen PDB file
+        light_chain: Light chain ID (e.g., 'L')
+        heavy_chain: Heavy chain ID (e.g., 'H')
+        antigen_chains: Comma-separated antigen chain IDs
+        email: User email for notifications
+        name: User name
+    
+    Returns:
+        Dict with job_id and slurm_job_id
+    """
+    
+    logger.info(f"Submitting VASCO job for user {user_id}")
+    
+    try:
+        ssh, sftp = _connect()
+        logger.info("SSH connection established")
+        
+        # HPC paths
+        hpc_input_dir = posixpath.join(VASCO_PIPELINE, "inputs", user_id)
+        hpc_output_dir = posixpath.join(VASCO_PIPELINE, "outputs", user_id)
+        
+        # Create directories on HPC
+        cmd = f"mkdir -p {hpc_input_dir} {hpc_output_dir}"
+        stdin, stdout, stderr = ssh.exec_command(cmd)
+        exit_code = stdout.channel.recv_exit_status()
+        
+        if exit_code != 0:
+            error = stderr.read().decode()
+            raise RuntimeError(f"Failed to create HPC directories: {error}")
+        
+        logger.info(f"Created HPC directories: {hpc_input_dir}")
+        
+        # Upload antibody PDB
+        hpc_antibody = posixpath.join(hpc_input_dir, "antibody.pdb")
+        sftp.put(local_antibody_path, hpc_antibody)
+        logger.info(f"Uploaded antibody.pdb to HPC")
+        
+        # Upload antigen PDB
+        hpc_antigen = posixpath.join(hpc_input_dir, "antigen.pdb")
+        sftp.put(local_antigen_path, hpc_antigen)
+        logger.info(f"Uploaded antigen.pdb to HPC")
+        
+        # Save metadata on HPC
+        metadata_content = f"""VASCO Analysis Metadata
+User ID: {user_id}
+Name: {name}
+Email: {email}
+Light Chain: {light_chain}
+Heavy Chain: {heavy_chain}
+Antigen Chains: {antigen_chains}
+Submitted: {time.strftime("%Y-%m-%d %H:%M:%S")}
+"""
+        
+        hpc_metadata = posixpath.join(hpc_input_dir, "metadata.txt")
+        with sftp.open(hpc_metadata, 'w') as f:
+            f.write(metadata_content)
+        
+        logger.info("Metadata saved to HPC")
+        
+        # Create Azure folder BEFORE submitting SLURM job
+        azure_folder_url = None
+        try:
+            logger.info(f"Creating Azure folder for user {user_id}")
+            create_azure_cmd = f"cd {VASCO_PIPELINE} && source /shared/centos7/anaconda3/3.7/bin/activate {VASCO_PIPELINE}/../allosmod-env && python3 azure_vasco.py create-folder {user_id}"
+            stdin_azure, stdout_azure, stderr_azure = ssh.exec_command(create_azure_cmd, get_pty=False)
+            stdin_azure.close()
+            stdout_azure.channel.settimeout(30.0)
+            stderr_azure.channel.settimeout(30.0)
+            
+            azure_output = stdout_azure.read().decode().strip()
+            azure_error = stderr_azure.read().decode().strip()
+            azure_exit = stdout_azure.channel.recv_exit_status()
+            
+            if azure_exit == 0 and azure_output:
+                # Extract URL from output (last line that starts with https://)
+                for line in azure_output.split('\n'):
+                    if line.strip().startswith('https://'):
+                        azure_folder_url = line.strip()
+                logger.info(f"Azure folder created: {azure_folder_url}")
+            else:
+                logger.warning(f"Azure folder creation had issues (exit {azure_exit}): {azure_error}")
+        except Exception as e:
+            logger.warning(f"Could not create Azure folder: {e}")
+        
+        # BACKUP OF OLD SLURM SUBMISSION CODE
+        # This version submitted to GPU nodes which have no internet
+        
+        # Cleanup temp SLURM script
+        # ssh.exec_command(f"rm {slurm_path}")
+        
+        # Generate Azure URL directly (format is predictable)
+        azure_folder_url = f"https://glacierstorage01.blob.core.windows.net/glacier/{user_id}/index.html"
+        logger.info(f"Generated Azure URL: {azure_folder_url}")
+        
+        # Close connections
+        sftp.close()
+        ssh.close()
+        
+        return {
+            "job_id": user_id,
+            "slurm_job_id": "backup_file",
+            "status": "submitted",
+            "azure_folder_url": azure_folder_url
+        }
+        
+    except paramiko.SSHException as e:
+        logger.error(f"SSH connection failed: {e}")
+        raise RuntimeError(f"Failed to connect to HPC: {str(e)}")
+    except Exception as e:
+        logger.exception(f"VASCO job submission failed: {e}")
+        raise RuntimeError(f"Failed to submit VASCO job: {str(e)}")
+
+
+def check_vasco_status(user_id: str) -> Dict[str, str]:
+    """Check status - backup file"""
+    return {"status": "backup", "user_id": user_id}

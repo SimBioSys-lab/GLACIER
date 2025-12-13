@@ -1,8 +1,9 @@
 """
-VASCO HPC Service
+VASCO HPC Service - Updated to run pipeline directly on login node
 
 Handles HPC integration for VASCO (Viral Antibody Structural Complex Analysis).
-Uploads files to HPC and submits SLURM jobs for paratope prediction.
+Uploads files to HPC and runs pipeline directly (not as SLURM batch job).
+This allows email notifications to work since login node has internet access.
 """
 import os
 import time
@@ -14,6 +15,14 @@ from app.config import settings
 from app.logging_config import setup_logging
 
 logger = setup_logging()
+
+# Import email function (will be used after job submission)
+try:
+    from app.services.emailer import send_vasco_email
+    EMAIL_AVAILABLE = True
+except ImportError:
+    EMAIL_AVAILABLE = False
+    logger.warning("Could not import send_vasco_email - email notifications will be disabled")
 
 # VASCO pipeline location on HPC
 VASCO_PIPELINE = "/projects/SimBioSys/share/software/VASCO"
@@ -72,7 +81,10 @@ def submit_vasco_job(
     name: str
 ) -> Dict[str, str]:
     """
-    Upload files to HPC and submit VASCO prediction job.
+    Upload files to HPC and run VASCO pipeline directly on login node.
+    
+    IMPORTANT: Pipeline now runs directly on login node (not as SLURM batch job)
+    because login node has internet access and can send email notifications.
     
     Args:
         user_id: Unique user identifier
@@ -85,7 +97,7 @@ def submit_vasco_job(
         name: User name
     
     Returns:
-        Dict with job_id and slurm_job_id
+        Dict with job_id, process_id, and azure_folder_url
     """
     
     logger.info(f"Submitting VASCO job for user {user_id}")
@@ -136,110 +148,84 @@ Submitted: {time.strftime("%Y-%m-%d %H:%M:%S")}
         
         logger.info("Metadata saved to HPC")
         
-        # Create SLURM job script with Azure URL capture
-        slurm_content = f"""#!/bin/bash
-#SBATCH -J vasco_{user_id[:8]}
-#SBATCH -o {hpc_output_dir}/vasco_%j.out
-#SBATCH -e {hpc_output_dir}/vasco_%j.err
-#SBATCH --partition=gpu
-#SBATCH --gres=gpu:v100-sxm2:1
-#SBATCH -t 8:00:00
-#SBATCH --cpus-per-task=10
-#SBATCH --mail-user={email}
-#SBATCH --mail-type=END,FAIL
-
-# Log start
-echo "=========================================="
-echo "⚡ VASCO Analysis Started"
-echo "User ID: {user_id}"
-echo "User: {name}"
-echo "Time: $(date)"
-echo "=========================================="
-echo ""
-
-# Run VASCO pipeline (includes Azure folder creation and upload)
-cd {VASCO_PIPELINE}
-./pipeline.sh {user_id}
-
-# Capture exit code
-PIPELINE_EXIT=$?
-
-# Log completion
-echo ""
-echo "=========================================="
-if [ $PIPELINE_EXIT -eq 0 ]; then
-    echo "✅ VASCO Analysis Completed Successfully"
-    
-    # Read Azure URL if available
-    AZURE_URL_FILE="{hpc_output_dir}/azure_url.txt"
-    if [ -f "$AZURE_URL_FILE" ]; then
-        AZURE_URL=$(cat "$AZURE_URL_FILE")
-        echo "📂 Azure Results: $AZURE_URL"
-    fi
-else
-    echo "❌ VASCO Analysis Failed (exit code: $PIPELINE_EXIT)"
-fi
-echo "Time: $(date)"
-echo "=========================================="
-
-exit $PIPELINE_EXIT
+        # Run pipeline directly on login node in background with nohup
+        # This runs on login node which has internet access for emails
+        logger.info(f"Running VASCO pipeline directly on login node for user {user_id}")
+        
+        run_cmd = f"""
+cd {VASCO_PIPELINE} && \
+nohup bash pipeline.sh {user_id} > {hpc_output_dir}/vasco_direct.out 2> {hpc_output_dir}/vasco_direct.err < /dev/null &
+echo $!
 """
         
-        # Upload SLURM script to tmp
-        slurm_path = f"/tmp/vasco_{user_id}.slurm"
-        with sftp.open(slurm_path, 'w') as f:
-            f.write(slurm_content)
+        stdin, stdout, stderr = ssh.exec_command(run_cmd, get_pty=False)
+        stdin.close()
+        stdout.channel.settimeout(5.0)  # Reduced timeout from 10s to 5s
+        stderr.channel.settimeout(5.0)
         
-        logger.info(f"Created SLURM script at {slurm_path}")
+        try:
+            process_output = stdout.read().decode().strip()
+            error_output = stderr.read().decode().strip()
+        except Exception as e:
+            logger.warning(f"Timeout reading command output: {e}")
+            process_output = ""
+            error_output = str(e)
         
-        # Submit SLURM job
-        submit_cmd = f"sbatch {slurm_path}"
-        stdin, stdout, stderr = ssh.exec_command(submit_cmd)
-        output = stdout.read().decode()
-        error = stderr.read().decode()
-        exit_code = stdout.channel.recv_exit_status()
+        if error_output:
+            logger.warning(f"Pipeline start stderr: {error_output}")
         
-        if exit_code != 0:
-            logger.error(f"SLURM submission failed: {error}")
-            raise RuntimeError(f"SLURM submission failed: {error}")
+        # Extract process ID
+        process_id = None
+        if process_output and process_output.split()[-1].isdigit():
+            process_id = process_output.split()[-1]
+            logger.info(f"Pipeline started with PID: {process_id}")
+        else:
+            logger.warning(f"Could not extract PID from output: {process_output}")
+            process_id = "unknown"
         
-        # Extract SLURM job ID from "Submitted batch job 12345"
-        slurm_job_id = output.strip().split()[-1]
-        logger.info(f"SLURM job submitted: {slurm_job_id}")
+        # Give pipeline a moment to start (reduced from 5s to 2s)
+        time.sleep(2)
         
-        # Cleanup temp SLURM script
-        ssh.exec_command(f"rm {slurm_path}")
-        
-        # Wait for Azure folder URL to be created (give it a few seconds)
-        import time as time_module
-        time_module.sleep(3)
-        
-        # Read Azure folder URL if it exists
+        # Check if Azure URL was created
+        azure_url_file = posixpath.join(hpc_output_dir, "azure_url.txt")
         azure_folder_url = None
-        azure_url_file = posixpath.join(VASCO_PIPELINE, "outputs", user_id, "azure_url.txt")
+        
         try:
             with sftp.open(azure_url_file, 'r') as f:
                 azure_folder_url = f.read().decode().strip()
-                logger.info(f"Retrieved Azure URL: {azure_folder_url}")
-        except Exception as e:
-            logger.warning(f"Could not read Azure URL file (may not be created yet): {e}")
-            # Try alternative location
-            try:
-                alt_azure_file = posixpath.join(VASCO_PIPELINE, "logs", user_id, "azure_folder_url.txt")
-                with sftp.open(alt_azure_file, 'r') as f:
-                    azure_folder_url = f.read().decode().strip()
-                    logger.info(f"Retrieved Azure URL from alternate location: {azure_folder_url}")
-            except Exception as e2:
-                logger.warning(f"Azure URL not available yet: {e2}")
+            logger.info(f"Read Azure URL from HPC: {azure_folder_url}")
+        except FileNotFoundError:
+            # Use default URL format
+            azure_folder_url = f"https://glacierstorage01.blob.core.windows.net/glacier/{user_id}/index.html"
+            logger.info(f"Using default Azure URL: {azure_folder_url}")
         
         # Close connections
         sftp.close()
         ssh.close()
         
+        # Send "job started" email from backend (backend has internet)
+        if EMAIL_AVAILABLE and email and email.strip():
+            try:
+                logger.info(f"Sending job started email to {email}")
+                send_vasco_email(
+                    action="started",
+                    email=email,
+                    name=name,
+                    user_id=user_id,
+                    job_id=process_id,
+                    azure_url=azure_folder_url
+                )
+                logger.info(f"Job started email sent successfully to {email}")
+            except Exception as e:
+                logger.warning(f"Failed to send job started email: {e}")
+                # Non-fatal - continue even if email fails
+        else:
+            logger.info("Email notifications disabled or no email provided")
+        
         return {
             "job_id": user_id,
-            "slurm_job_id": slurm_job_id,
-            "status": "submitted",
+            "process_id": process_id,
+            "status": "running",
             "azure_folder_url": azure_folder_url
         }
         
@@ -280,7 +266,7 @@ def check_vasco_status(user_id: str) -> Dict[str, str]:
                 "user_id": user_id
             }
         except FileNotFoundError:
-            # Check for SLURM output files
+            # Check for output files (either vasco_direct.out or vasco_*.out)
             try:
                 # List files in output directory
                 cmd = f"ls {output_dir}/*.out 2>/dev/null | head -1"
@@ -295,21 +281,21 @@ def check_vasco_status(user_id: str) -> Dict[str, str]:
                     
                     # Parse current step from output
                     current_step = "Processing"
-                    if "Step 1/8" in output or "Extract chains" in output:
+                    if "Step 1" in output or "Extract chains" in output or "Validating" in output:
                         current_step = "Step 1/8: Extracting chains"
-                    elif "Step 2/8" in output or "adjacency" in output:
+                    elif "Step 2" in output or "adjacency" in output or "Combining" in output:
                         current_step = "Step 2/8: Building graph"
-                    elif "Step 3/8" in output or "HHblits" in output:
-                        current_step = "Step 3/8: Generating MSA (slowest)"
-                    elif "Step 4/8" in output or "Downsample" in output:
+                    elif "Step 3" in output or "HHblits" in output or "MSA" in output:
+                        current_step = "Step 3/8: Generating MSA (slowest, 2-4 hours)"
+                    elif "Step 4" in output or "Downsample" in output:
                         current_step = "Step 4/8: Downsampling MSA"
-                    elif "Step 5/8" in output or "ESM" in output:
-                        current_step = "Step 5/8: ESM tokenization"
-                    elif "Step 6/8" in output or "edge" in output:
+                    elif "Step 5" in output or "ESM" in output or "embed" in output:
+                        current_step = "Step 5/8: ESM embeddings"
+                    elif "Step 6" in output or "edge" in output:
                         current_step = "Step 6/8: Processing edges"
-                    elif "Step 7/8" in output or "prediction" in output:
+                    elif "Step 7" in output or "prediction" in output or "neural" in output:
                         current_step = "Step 7/8: Running prediction"
-                    elif "Step 8/8" in output or "visualization" in output:
+                    elif "Step 8" in output or "visualization" in output or "heatmap" in output:
                         current_step = "Step 8/8: Generating visualization"
                     
                     sftp.close()
@@ -326,8 +312,8 @@ def check_vasco_status(user_id: str) -> Dict[str, str]:
                     ssh.close()
                     
                     return {
-                        "status": "queued",
-                        "message": "Job queued, waiting to start",
+                        "status": "starting",
+                        "message": "Job starting, waiting for output",
                         "user_id": user_id
                     }
                     
