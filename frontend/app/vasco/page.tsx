@@ -3,22 +3,22 @@
 import React, { useState, useRef } from "react"
 import Header from "@/components/layout/Header"
 import Footer from "@/components/layout/Footer"
-import MultiStepForm from "@/components/form/MultiStepForm"
-import { SubmissionStatus } from "@/components/submission-status"
-import GlycoShieldCitation from "@/components/citation/GlycoShieldCitation"
-import { GlycoShieldCarousel } from "@/components/carousel"
+import ParatopeMultiStepForm from "@/components/paratope-form/ParatopeMultiStepForm"
+import ParatopeCitation from "@/components/citation/ParatopeCitation"
+import { ParatopeSubmissionStatus } from "@/components/paratope-submission-status"
 
-export default function GlycoShieldPage() {
+export default function VascoPage() {
   const [submitError, setSubmitError] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
-  const [jobIds, setJobIds] = useState<string[]>([])
+  const [jobId, setJobId] = useState<string>()
+  const [userId, setUserId] = useState<string>()
   const [azureUrl, setAzureUrl] = useState<string>()
   const [isSubmitted, setIsSubmitted] = useState(false)
   const formSectionRef = useRef<HTMLDivElement>(null)
 
-  const handleSubmitSuccess = (newJobIds: string[], azureUrl?: string) => {
-    setJobIds(newJobIds)
-    console.log('Setting Azure URL in glycoshield page:', azureUrl)
+  const handleSubmitSuccess = (jobId: string, userId: string, azureUrl?: string) => {
+    setJobId(jobId)
+    setUserId(userId)
     setAzureUrl(azureUrl)
     setIsSubmitted(true)
     setSubmitError(false)
@@ -35,43 +35,42 @@ export default function GlycoShieldPage() {
     }, 5000)
   }
 
+  const handleCloseStatus = () => {
+    setIsSubmitted(false)
+    setSubmitError(false)
+    setJobId(undefined)
+    setUserId(undefined)
+    setAzureUrl(undefined)
+  }
+
   return (
     <div className="relative min-h-screen text-[#1A1A1A] font-sans bg-gradient-to-br from-[#F5F4F9] via-[#E8E3F0] to-[#DDD4E8]">
-      {/* Floating Header - Same as homepage */}
+      {/* Floating Header - Same as other pages */}
       <Header onScrollToForm={() => formSectionRef.current?.scrollIntoView({ behavior: "smooth" })} />
 
       {/* Main Content Container with top spacing */}
       <main className="relative pt-32">
-        {/* Carousel Section */}
-        <GlycoShieldCarousel />
-
         {/* Multi-Step Form Section */}
-        <MultiStepForm 
+        <ParatopeMultiStepForm 
           ref={formSectionRef}
-          showForm={true}
           onSubmitSuccess={handleSubmitSuccess}
           onSubmitError={handleSubmitError}
         />
 
-        {/* Citation Section - GlycoShield specific */}
-        <GlycoShieldCitation />
+        {/* Citation Section - VASCO specific */}
+        <ParatopeCitation />
 
-        {/* Status Messages */}
-        <SubmissionStatus
+        {/* Status Modal */}
+        <ParatopeSubmissionStatus
           isSubmitted={isSubmitted}
           isError={submitError}
           errorMessage={errorMessage}
-          jobIds={jobIds}
+          jobId={jobId}
+          userId={userId}
           azureUrl={azureUrl}
-          onClose={() => {
-            setIsSubmitted(false)
-            setSubmitError(false)
-            setJobIds([])
-            setAzureUrl(undefined)
-          }}
+          onClose={handleCloseStatus}
         />
 
-        {/* Footer Section */}
         <Footer />
       </main>
     </div>

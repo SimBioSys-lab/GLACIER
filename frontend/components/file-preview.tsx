@@ -6,11 +6,12 @@ import ErrorBoundary from './error-boundary';
 
 interface FilePreviewProps {
   file: File;
+  folderName?: string;
   index: number;
   totalFiles: number;
 }
 
-const FilePreview: React.FC<FilePreviewProps> = ({ file, index, totalFiles }) => {
+const FilePreview: React.FC<FilePreviewProps> = ({ file, folderName, index, totalFiles }) => {
   const [fileContent, setFileContent] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -121,7 +122,14 @@ const FilePreview: React.FC<FilePreviewProps> = ({ file, index, totalFiles }) =>
   return (
     <div className="mt-4 border border-white/20 rounded-lg overflow-hidden">
       <div className="bg-white/10 px-4 py-3 border-b border-white/20 flex items-center justify-between">
-        <h3 className="font-medium text-white">{file.name}</h3>
+        <div className="flex items-center gap-3">
+          {folderName && (
+            <span className="text-sm font-semibold bg-[#8B7DFF]/80 px-3 py-1 rounded-full text-white">
+              {folderName}
+            </span>
+          )}
+          <h3 className="font-medium text-white">{file.name}</h3>
+        </div>
         <div className="flex items-center gap-2">
           <span className="text-xs bg-white/20 px-2 py-1 rounded-full text-white/80">
             {getFormattedSize(file.size)}

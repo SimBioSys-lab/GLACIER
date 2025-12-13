@@ -11,7 +11,7 @@ import StepTwo from "@/components/form/StepTwo"
 import type { FormData } from "@/components/form/StepTwo"
 
 interface ParatopeMultiStepFormProps {
-  onSubmitSuccess: (jobId: string, userId: string) => void
+  onSubmitSuccess: (jobId: string, userId: string, azureUrl?: string) => void
   onSubmitError: (error: string) => void
 }
 
@@ -95,7 +95,8 @@ const ParatopeMultiStepForm = forwardRef<HTMLDivElement, ParatopeMultiStepFormPr
         const result = await response.json()
         
         setIsSubmitting(false)
-        onSubmitSuccess(result.job_id, result.user_id)
+        console.log('VASCO submission result:', result)
+        onSubmitSuccess(result.job_id, result.user_id, result.azure_folder_url)
 
         // Reset form after success
         setTimeout(() => {

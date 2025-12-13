@@ -3,18 +3,26 @@
  * Provides example files for demonstration purposes
  */
 
-// Define the example file paths
+// Define the example file paths for both examples
 const EXAMPLE_FILES = {
-  pdb: '/examples/spikeD/start.pdb',
-  ali: '/examples/spikeD/align.ali',
-  glyc: '/examples/spikeD/glyc.dat',
-  input: '/examples/spikeD/input.dat'
+  spikeD: {
+    pdb: '/examples/spikeD/start.pdb',
+    ali: '/examples/spikeD/align.ali',
+    glyc: '/examples/spikeD/glyc.dat',
+    input: '/examples/spikeD/input.dat'
+  },
+  bg505: {
+    pdb: '/examples/bg505/bg505.pdb',
+    ali: '/examples/bg505/align.ali',
+    glyc: '/examples/bg505/glyc.dat',
+    input: '/examples/bg505/input.dat'
+  }
 }
 
 // Example metadata for display
 export const EXAMPLE_DATA = {
-  name: 'Spike Protein D614G',
-  description: 'SARS-CoV-2 spike protein glycosylation analysis example',
+  name: 'Spike Protein D614G & BG505 HIV Envelope',
+  description: 'Two example analyses: SARS-CoV-2 spike protein and HIV BG505 envelope protein glycosylation',
   // These values are not used anymore since we use per-folder configs
   // But keeping them for backward compatibility
   numberOfRuns: 1,
@@ -23,7 +31,7 @@ export const EXAMPLE_DATA = {
     fullName: '',
     email: '',
     organization: 'SimBioSys Lab Demo',
-    description: 'This is an example run demonstrating the GLACIER processing pipeline'
+    description: 'This is an example run demonstrating the GLACIER processing pipeline with multiple proteins'
   }
 }
 
@@ -46,26 +54,33 @@ async function fetchFileAsBlob(url: string, filename: string): Promise<File> {
 }
 
 /**
- * Load all example files for the demo run
+ * Load all example files for the demo run (both spikeD and bg505)
  */
 export async function loadExampleFiles(): Promise<{
   files: File[]
   formData: typeof EXAMPLE_DATA.formData
 }> {
   try {
-    // Fetch all example files in parallel
-    const filePromises = [
-      fetchFileAsBlob(EXAMPLE_FILES.pdb, 'start.pdb'),
-      fetchFileAsBlob(EXAMPLE_FILES.ali, 'align.ali'),
-      fetchFileAsBlob(EXAMPLE_FILES.glyc, 'glyc.dat'),
-      fetchFileAsBlob(EXAMPLE_FILES.input, 'input.dat')
+    // Fetch all example files from both folders in parallel
+    const spikeDPromises = [
+      fetchFileAsBlob(EXAMPLE_FILES.spikeD.pdb, 'start.pdb').then(file => ({ file, folder: 'spikeD' })),
+      fetchFileAsBlob(EXAMPLE_FILES.spikeD.ali, 'align.ali').then(file => ({ file, folder: 'spikeD' })),
+      fetchFileAsBlob(EXAMPLE_FILES.spikeD.glyc, 'glyc.dat').then(file => ({ file, folder: 'spikeD' })),
+      fetchFileAsBlob(EXAMPLE_FILES.spikeD.input, 'input.dat').then(file => ({ file, folder: 'spikeD' }))
     ]
     
-    const files = await Promise.all(filePromises)
+    const bg505Promises = [
+      fetchFileAsBlob(EXAMPLE_FILES.bg505.pdb, 'bg505.pdb').then(file => ({ file, folder: 'bg505' })),
+      fetchFileAsBlob(EXAMPLE_FILES.bg505.ali, 'align.ali').then(file => ({ file, folder: 'bg505' })),
+      fetchFileAsBlob(EXAMPLE_FILES.bg505.glyc, 'glyc.dat').then(file => ({ file, folder: 'bg505' })),
+      fetchFileAsBlob(EXAMPLE_FILES.bg505.input, 'input.dat').then(file => ({ file, folder: 'bg505' }))
+    ]
+    
+    const allFileResults = await Promise.all([...spikeDPromises, ...bg505Promises])
     
     // Create files with a custom property to track folder path
     // We'll use Object.defineProperty to add a non-enumerable property
-    const filesWithPath = files.map(file => {
+    const filesWithPath = allFileResults.map(({ file, folder }) => {
       // Create a new File object that extends the original
       const fileWithPath = new File([file], file.name, {
         type: file.type,
@@ -74,7 +89,7 @@ export async function loadExampleFiles(): Promise<{
       
       // Add a custom property for the path (not webkitRelativePath since it's read-only)
       Object.defineProperty(fileWithPath, '_examplePath', {
-        value: `spikeD/${file.name}`,
+        value: `${folder}/${file.name}`,
         writable: false,
         enumerable: false
       })
@@ -82,7 +97,7 @@ export async function loadExampleFiles(): Promise<{
       // Also try to add webkitRelativePath using defineProperty if possible
       try {
         Object.defineProperty(fileWithPath, 'webkitRelativePath', {
-          value: `spikeD/${file.name}`,
+          value: `${folder}/${file.name}`,
           writable: false,
           configurable: true
         })
@@ -108,10 +123,13 @@ export async function loadExampleFiles(): Promise<{
  * Check if the current session is using example data
  */
 export function isExampleData(files: File[]): boolean {
-  if (files.length !== 4) return false
+  if (files.length !== 8) return false
   
   const fileNames = files.map(f => f.name).sort()
-  const exampleFileNames = ['start.pdb', 'align.ali', 'glyc.dat', 'input.dat'].sort()
+  const exampleFileNames = [
+    'start.pdb', 'align.ali', 'glyc.dat', 'input.dat',  // spikeD
+    'bg505.pdb', 'align.ali', 'glyc.dat', 'input.dat'  // bg505
+  ].sort()
   
   return JSON.stringify(fileNames) === JSON.stringify(exampleFileNames)
 }

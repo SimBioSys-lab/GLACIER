@@ -3,10 +3,13 @@
 import React, { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import SimplifiedGlassSurface from '../SimplifiedGlassSurface'
+import DocumentationModal from '../modals/DocumentationModal'
 
 export default function VideoHeroSection() {
   const [videoLoaded, setVideoLoaded] = useState(false)
   const [currentSlide, setCurrentSlide] = useState(0)
+  const [modalOpen, setModalOpen] = useState(false)
+  const [modalType, setModalType] = useState<'glycoshield' | 'vasco'>('glycoshield')
   const videoRef = React.useRef<HTMLVideoElement>(null)
   const router = useRouter()
 
@@ -24,7 +27,7 @@ export default function VideoHeroSection() {
       name: "VASCO",
       icon: "lightning",
       color: "#FF6B9D",
-      route: "/paratope"
+      route: "/vasco"
     }
   ]
 
@@ -45,6 +48,11 @@ export default function VideoHeroSection() {
 
   const handleStart = () => {
     router.push(tools[currentSlide].route)
+  }
+
+  const handleLearnMore = (type: 'glycoshield' | 'vasco') => {
+    setModalType(type)
+    setModalOpen(true)
   }
 
   return (
@@ -164,17 +172,13 @@ export default function VideoHeroSection() {
                             Start GlycoShield Analysis
                           </button>
 
-                          <a
-                            href="#citation"
-                            onClick={(e) => {
-                              e.preventDefault()
-                              scrollToCitation()
-                            }}
+                          <button
+                            onClick={() => handleLearnMore('glycoshield')}
                             className="text-[#8B7DFF] hover:text-[#7B6DFF] font-medium px-4 py-4 transition-colors duration-150 hover:underline underline-offset-4"
                             style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}
                           >
                             Learn more
-                          </a>
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -228,17 +232,13 @@ export default function VideoHeroSection() {
                             Predict VASCO
                           </button>
 
-                          <a
-                            href="#citation"
-                            onClick={(e) => {
-                              e.preventDefault()
-                              scrollToCitation()
-                            }}
+                          <button
+                            onClick={() => handleLearnMore('vasco')}
                             className="text-[#FF6B9D] hover:text-[#C44569] font-medium px-4 py-4 transition-colors duration-150 hover:underline underline-offset-4"
                             style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}
                           >
                             Learn more
-                          </a>
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -259,6 +259,13 @@ export default function VideoHeroSection() {
           <div className="w-0.5 h-2 bg-[#1A1A1A]/50 rounded-full mt-2" />
         </div>
       </button>
+
+      {/* Documentation Modal */}
+      <DocumentationModal 
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        type={modalType}
+      />
 
       <style jsx>{`
         @keyframes fadeIn {

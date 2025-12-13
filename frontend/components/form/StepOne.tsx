@@ -31,13 +31,19 @@ const downloadFile = (url: string, filename: string) => {
   document.body.removeChild(a)
 }
 
-// Helper function to download all example files
+// Helper function to download all example files (both folders)
 const downloadExampleFiles = () => {
   const files = [
-    { url: '/examples/spikeD/start.pdb', name: 'start.pdb' },
-    { url: '/examples/spikeD/align.ali', name: 'align.ali' },
-    { url: '/examples/spikeD/glyc.dat', name: 'glyc.dat' },
-    { url: '/examples/spikeD/input.dat', name: 'input.dat' }
+    // SpikeD files
+    { url: '/examples/spikeD/start.pdb', name: 'spikeD_start.pdb' },
+    { url: '/examples/spikeD/align.ali', name: 'spikeD_align.ali' },
+    { url: '/examples/spikeD/glyc.dat', name: 'spikeD_glyc.dat' },
+    { url: '/examples/spikeD/input.dat', name: 'spikeD_input.dat' },
+    // BG505 files
+    { url: '/examples/bg505/bg505.pdb', name: 'bg505_bg505.pdb' },
+    { url: '/examples/bg505/align.ali', name: 'bg505_align.ali' },
+    { url: '/examples/bg505/glyc.dat', name: 'bg505_glyc.dat' },
+    { url: '/examples/bg505/input.dat', name: 'bg505_input.dat' }
   ]
 
   // Download each file with a small delay to prevent blocking
@@ -226,8 +232,8 @@ export default function StepOne({
       onFormDataChange(exampleData.formData);
       setIsExample(true);
       
-      // Auto-expand the example folder
-      setExpandedFolders(new Set(['spikeD']));
+      // Auto-expand both example folders
+      setExpandedFolders(new Set(['spikeD', 'bg505']));
       
       console.log('Example files loaded successfully');
     } catch (error) {
@@ -388,7 +394,7 @@ export default function StepOne({
                   )}
                 </Button>
                 <p className="text-xs text-[#1A1A1A]/60">
-                  Download all 4 example files to your computer
+                  Download all 8 example files (2 folders) to your computer
                 </p>
               </div>
             </div>
@@ -507,7 +513,7 @@ export default function StepOne({
                   const isExpanded = expandedFolders.has(folder.name);
                   const folderPdbCount = folder.files.filter(f => isPDBFile(f.name)).length;
                   const missing = getMissingRequirements(folder);
-                  const isExampleFolder = folder.name === 'spikeD' && isExample;
+                  const isExampleFolder = (folder.name === 'spikeD' || folder.name === 'bg505') && isExample;
                   
                   return (
                     <div key={folder.name} className="bg-white">
@@ -750,14 +756,22 @@ export default function StepOne({
               </div>
             </div>
             <div className="space-y-4 max-h-[800px] overflow-y-auto pr-2">
-              {pdbFiles.map((file, index) => (
-                <FilePreview
-                  key={index}
-                  file={file}
-                  index={index}
-                  totalFiles={pdbFiles.length}
-                />
-              ))}
+              {pdbFiles.map((file, index) => {
+                // Extract folder name from file
+                const fileWithPath = file as FileWithPath;
+                const path = fileWithPath.webkitRelativePath || (fileWithPath as any)._examplePath || '';
+                const folderName = path ? path.split('/')[0] : 'Unknown Folder';
+                
+                return (
+                  <FilePreview
+                    key={index}
+                    file={file}
+                    folderName={folderName}
+                    index={index}
+                    totalFiles={pdbFiles.length}
+                  />
+                );
+              })}
             </div>
           </div>
         )}
