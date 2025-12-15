@@ -46,14 +46,23 @@ export class SubmissionService {
     formDataToSend.append('organization', data.formData.organization || '')
     formDataToSend.append('description', data.formData.description || '')
     
-    // For now, use the first folder's config for global parameters
-    // (Backend currently expects single values, not per-folder)
+    // Send per-folder configurations as JSON
+    // Backend will parse this to apply folder-specific settings
+    const folderConfigsData = data.folderConfigs.map(folder => ({
+      folderName: folder.name,
+      numberOfRuns: folder.config.numberOfRuns || 1,
+      gefProbeRadius: folder.config.gefProbeRadius || 3,
+      attachGaps: folder.config.attachGaps !== false
+    }))
+    formDataToSend.append('folder_configs', JSON.stringify(folderConfigsData))
+    
+    // Also send global defaults for backward compatibility
+    // Backend should prefer per-folder configs when available
     if (data.folderConfigs.length > 0) {
       const firstConfig = data.folderConfigs[0].config
       formDataToSend.append('numberOfRuns', (firstConfig.numberOfRuns || 1).toString())
       formDataToSend.append('GEFProbeRadius', (firstConfig.gefProbeRadius || 3).toString())
     } else {
-      // Fallback defaults
       formDataToSend.append('numberOfRuns', '1')
       formDataToSend.append('GEFProbeRadius', '3')
     }
