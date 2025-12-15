@@ -107,7 +107,8 @@ def upload_folder_to_hpc(
     local_folder_path: str,
     hpc_folder_path: str,
     number_of_runs: int,
-    gef_probe_radius: int
+    gef_probe_radius: int,
+    attach_gaps: bool = True
 ) -> List[str]:
     """
     Upload an entire folder from local to HPC, preserving all files.
@@ -262,6 +263,7 @@ def stage_folders_and_start_pipeline(
     name: str,
     organization: str,
     description: str,
+    folder_configs: Optional[Dict[str, dict]] = None,
 ) -> dict:
     """
     Upload pre-organized local folders to HPC and start pipeline.
@@ -279,29 +281,40 @@ def stage_folders_and_start_pipeline(
         for folder_name, local_folder_path in local_folder_paths.items():
             print(f"\nDEBUG: Processing folder: {folder_name}")
             
+            # Get per-folder config if available, otherwise use global defaults
+            folder_cfg = {}
+            if folder_configs and folder_name in folder_configs:
+                folder_cfg = folder_configs[folder_name]
+                print(f"DEBUG: Using per-folder config for {folder_name}: {folder_cfg}")
+            
+            folder_number_of_runs = folder_cfg.get('numberOfRuns', number_of_runs)
+            folder_gef_probe_radius = folder_cfg.get('gefProbeRadius', gef_probe_radius)
+            
+            print(f"DEBUG: Folder {folder_name} settings - NRUNS={folder_number_of_runs}, GEF_PROBE_RADIUS={folder_gef_probe_radius}")
+            
             # HPC destination for this folder
             hpc_folder_path = posixpath.join(paths["user_inputs_dir"], folder_name)
             
-            # Upload entire folder
+            # Upload entire folder with folder-specific settings
             uploaded_files = upload_folder_to_hpc(
                 ssh=ssh,
                 sftp=sftp,
                 local_folder_path=local_folder_path,
                 hpc_folder_path=hpc_folder_path,
-                number_of_runs=number_of_runs,
-                gef_probe_radius=gef_probe_radius
+                number_of_runs=folder_number_of_runs,
+                gef_probe_radius=folder_gef_probe_radius
             )
             
             # Save metadata for this folder as metadata.txt (not JSON)
-            # This is needed for each individual folder
+            # This is needed for each individual folder - use folder-specific values
             metadata_txt = f"""USER_ID={req_user_id}
 EMAIL={email}
 JOB_NAME={folder_name}
 NAME={name}
 ORGANIZATION={organization}
 DESCRIPTION={description}
-NUMBER_OF_RUNS={number_of_runs}
-GEF_PROBE_RADIUS={gef_probe_radius}
+NUMBER_OF_RUNS={folder_number_of_runs}
+GEF_PROBE_RADIUS={folder_gef_probe_radius}
 TIMESTAMP={int(time.time())}
 """
 
@@ -312,23 +325,34 @@ TIMESTAMP={int(time.time())}
             all_folders.append({
                 'folder_name': folder_name,
                 'folder_path': hpc_folder_path,
-                'file_count': len(uploaded_files)
+                'file_count': len(uploaded_files),
+                'number_of_runs': folder_number_of_runs,
+                'gef_probe_radius': folder_gef_probe_radius
             })
         
         print(f"\nDEBUG: Successfully uploaded {len(all_folders)} folder(s) to HPC")
         
         # Create metadata.txt in the parent user_inputs_dir
         # This is what the pipeline.sh script looks for
+        # Note: Per-folder settings are in each folder's metadata.txt
+        # This parent metadata is for pipeline orchestration (email, user info)
+        
+        # Build folder configs summary for reference
+        folder_configs_summary = "\n".join([
+            f"# {f['folder_name']}: NRUNS={f['number_of_runs']}, GEF_PROBE_RADIUS={f['gef_probe_radius']}"
+            for f in all_folders
+        ])
+        
         user_metadata_txt = f"""USER_ID={req_user_id}
 EMAIL={email}
 JOB_NAME={req_user_id}_submission
 NAME={name}
 ORGANIZATION={organization}
 DESCRIPTION={description}
-NUMBER_OF_RUNS={number_of_runs}
-GEF_PROBE_RADIUS={gef_probe_radius}
 TIMESTAMP={int(time.time())}
 FOLDER_COUNT={len(all_folders)}
+# Per-folder settings (see each folder's metadata.txt for actual values used):
+{folder_configs_summary}
 """
 
         user_metadata_path = posixpath.join(paths["user_inputs_dir"], "metadata.txt")

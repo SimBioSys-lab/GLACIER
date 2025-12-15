@@ -1,6 +1,7 @@
 import os
 import time
 import uuid
+import json
 from typing import List, Dict
 from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, UploadFile, HTTPException
 from app.config import settings
@@ -25,6 +26,7 @@ async def upload(
     description: str = Form(""),
     numberOfRuns: int = Form(1),
     GEFProbeRadius: int = Form(3),
+    folder_configs: Optional[str] = Form(None),  # JSON string with per-folder configs
     user_id: Optional[str] = Form(None),
     files: List[UploadFile] = File(..., alias="files"),
     file_folders: List[str] = Form(...),  # Folder name for each file
@@ -42,6 +44,23 @@ async def upload(
     req_user_id = user_id or str(uuid.uuid4())
     user_id_var.set(req_user_id)
 
+    # Parse per-folder configurations if provided
+    parsed_folder_configs: Dict[str, dict] = {}
+    if folder_configs:
+        try:
+            configs_list = json.loads(folder_configs)
+            for cfg in configs_list:
+                folder_name = cfg.get('folderName')
+                if folder_name:
+                    parsed_folder_configs[folder_name] = {
+                        'numberOfRuns': cfg.get('numberOfRuns', numberOfRuns),
+                        'gefProbeRadius': cfg.get('gefProbeRadius', GEFProbeRadius),
+                        'attachGaps': cfg.get('attachGaps', True)
+                    }
+            logger.info(f"Parsed per-folder configs: {parsed_folder_configs}")
+        except json.JSONDecodeError as e:
+            logger.warning(f"Failed to parse folder_configs JSON: {e}, using global defaults")
+
     # Create user directory (organized like HPC structure: uploads/{user_id}/)
     user_dir = os.path.join(settings.UPLOAD_FOLDER, req_user_id)
     os.makedirs(user_dir, exist_ok=True)
@@ -54,10 +73,11 @@ async def upload(
             f"Email: {email}\n"
             f"Organization: {organization}\n"
             f"Description: {description}\n"
-            f"Number of Runs: {numberOfRuns}\n"
-            f"GEF Probe Radius: {GEFProbeRadius}\n"
+            f"Number of Runs (default): {numberOfRuns}\n"
+            f"GEF Probe Radius (default): {GEFProbeRadius}\n"
             f"User ID: {req_user_id}\n"
             f"Timestamp: {timestamp}\n"
+            f"Per-folder configs: {json.dumps(parsed_folder_configs)}\n"
         )
 
     # Organize files by their original folder
@@ -89,8 +109,9 @@ async def upload(
     try:
         run_meta = stage_folders_and_start_pipeline(
             local_folder_paths=local_folder_paths,
-            number_of_runs=numberOfRuns,
-            gef_probe_radius=GEFProbeRadius,
+            number_of_runs=numberOfRuns,  # Global default
+            gef_probe_radius=GEFProbeRadius,  # Global default
+            folder_configs=parsed_folder_configs,  # Per-folder overrides
             req_user_id=req_user_id,
             email=email,
             name=name,
