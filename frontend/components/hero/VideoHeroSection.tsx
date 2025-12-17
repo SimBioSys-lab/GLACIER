@@ -147,12 +147,13 @@ export default function VideoHeroSection() {
                     >
                       <div className="flex flex-col h-full">
                         {/* Headline */}
-                        <h1 className="text-2xl md:text-3xl xl:text-4xl font-normal leading-[1.05] mb-3 tracking-[0.015em] text-black/70" style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}>
-                          Decode
+                        <h1 className="text-2xl md:text-3xl xl:text-4xl font-normal leading-[1.15] mb-3 tracking-[0.015em] text-black/70" style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}>
+                          Ensemble Modelling and 
+                          <br />Quantification of
                           <br />
                           <span className="font-vt323 text-[#8B7DFF] text-5xl">GLYCAN SHIELDING</span>
                           <br />
-                          on viral proteins.
+                          on viral surface proteins.
                         </h1>
 
                         {/* Subheadline */}
@@ -194,7 +195,7 @@ export default function VideoHeroSection() {
                         <h1 className="text-2xl md:text-3xl xl:text-4xl font-normal leading-[1.05] mb-3 tracking-[0.015em] text-black/70" style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}>
                           Predict
                           <br />
-                          <span className="font-vt323 text-[#FF6B9D] text-4xl">ANTIBODY INTERFACES</span>
+                          <span className="font-vt323 text-[#FF6B9D] text-5xl">ANTIBODY INTERFACES</span>
                           <br />
                           with AI precision.
                         </h1>
@@ -202,7 +203,7 @@ export default function VideoHeroSection() {
                         {/* Subheadline */}
                         <div className="mb-4 max-w-lg">
                           <p className="text-base text-black/70 leading-relaxed" style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}>
-                            Identify antibody-antigen binding sites with <span className="font-medium">deep learning</span>. MSA-powered neural networks analyze evolutionary patterns and 3D structure for state-of-the-art predictions.
+                            Identify antibody-antigen binding sites with <span className="font-medium">deep learning</span>. MSA-powered neural networks analyze evolutionary patterns and 3D structure for epitope and paratope predictions.
                           </p>
                         </div>
 
