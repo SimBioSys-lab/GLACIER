@@ -54,7 +54,7 @@ export default function Header({ onScrollToForm }: HeaderProps) {
                     </h5>
                   ) : (
                     <h1 
-                      className="text-xl font-mono text-black transition-opacity duration-300" 
+                      className="text-2xl font-mono text-black transition-opacity duration-300" 
                       style={{ 
                         fontFamily: 'var(--font-nothing), monospace',
                         opacity: isHovered ? 0 : 1
