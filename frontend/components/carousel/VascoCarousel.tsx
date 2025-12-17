@@ -65,16 +65,19 @@ export default function VascoCarousel({ autoPlayDuration = 20000 }: VascoCarouse
 
   const slideVariants = {
     enter: (direction: number) => ({
-      x: direction > 0 ? 1000 : -1000,
-      opacity: 0
+      x: direction > 0 ? 600 : -600,
+      opacity: 0,
+      scale: 0.95
     }),
     center: {
       x: 0,
-      opacity: 1
+      opacity: 1,
+      scale: 1
     },
     exit: (direction: number) => ({
-      x: direction < 0 ? 1000 : -1000,
-      opacity: 0
+      x: direction < 0 ? 600 : -600,
+      opacity: 0,
+      scale: 0.95
     })
   }
 
@@ -165,32 +168,55 @@ export default function VascoCarousel({ autoPlayDuration = 20000 }: VascoCarouse
           </AnimatePresence>
         </div>
 
-        {/* Carousel Container - Custom Glass Effect with Pink Theme */}
-        <div 
-          className="relative w-full rounded-[32px]"
-          style={{
-            background: 'rgba(255, 255, 255, 0.85)',
-            backdropFilter: 'blur(25px) saturate(1.8)',
-            WebkitBackdropFilter: 'blur(25px) saturate(1.8)',
-            border: '1px solid rgba(255, 255, 255, 0.4)',
-            boxShadow: `
-              0 8px 32px 0 rgba(31, 38, 135, 0.15),
-              0 2px 16px 0 rgba(31, 38, 135, 0.1),
-              inset 0 1px 0 0 rgba(255, 255, 255, 0.5),
-              inset 0 -1px 0 0 rgba(255, 255, 255, 0.3)
-            `,
-            height: '600px'
-          }}
-          onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => setIsPaused(false)}
-        >
-          {/* Inner container with background */}
+        {/* Carousel Container with Ambient Effects */}
+        <div className="relative">
+          {/* Outer ambient glow - Pink theme */}
           <div 
-            className="relative w-full h-full rounded-[32px] overflow-hidden"
+            className="absolute -inset-4 rounded-[48px] opacity-50"
             style={{
-              background: 'linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.1) 100%)'
+              background: 'radial-gradient(ellipse at center, rgba(255, 107, 157, 0.15) 0%, transparent 70%)',
+              filter: 'blur(40px)',
             }}
+          />
+          
+          {/* Secondary ambient layer */}
+          <div 
+            className="absolute -inset-2 rounded-[40px]"
+            style={{
+              background: 'linear-gradient(135deg, rgba(255, 107, 157, 0.08) 0%, rgba(255, 150, 180, 0.05) 50%, rgba(255, 107, 157, 0.08) 100%)',
+              filter: 'blur(20px)',
+            }}
+          />
+
+          {/* Main Carousel Container */}
+          <div 
+            className="relative w-full rounded-[32px] overflow-hidden"
+            style={{
+              background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%)',
+              backdropFilter: 'blur(30px) saturate(1.5)',
+              WebkitBackdropFilter: 'blur(30px) saturate(1.5)',
+              border: '1px solid rgba(255, 255, 255, 0.6)',
+              boxShadow: `
+                0 0 0 1px rgba(255, 107, 157, 0.05),
+                0 4px 16px 0 rgba(255, 107, 157, 0.08),
+                0 8px 32px 0 rgba(31, 38, 135, 0.1),
+                0 16px 48px 0 rgba(31, 38, 135, 0.08),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.8),
+                inset 0 -1px 0 0 rgba(255, 255, 255, 0.4)
+              `,
+              height: '600px'
+            }}
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
           >
+            {/* Inner soft vignette effect */}
+            <div 
+              className="absolute inset-0 pointer-events-none z-[5] rounded-[32px]"
+              style={{
+                background: 'radial-gradient(ellipse at center, transparent 50%, rgba(255, 107, 157, 0.03) 100%)',
+              }}
+            />
+
             {/* Slides */}
             <AnimatePresence initial={false} custom={direction} mode="wait">
               <motion.div
@@ -201,63 +227,57 @@ export default function VascoCarousel({ autoPlayDuration = 20000 }: VascoCarouse
                 animate="center"
                 exit="exit"
                 transition={{
-                  x: { type: "spring", stiffness: 300, damping: 30 },
-                  opacity: { duration: 0.2 }
+                  x: { type: "spring", stiffness: 250, damping: 30 },
+                  opacity: { duration: 0.3 },
+                  scale: { duration: 0.3 }
                 }}
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: '32px'
-                }}
+                className="absolute inset-0 flex items-center justify-center p-8 md:p-12"
               >
-                {/* Image with container */}
-                <div 
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    maxWidth: '1200px',
-                    maxHeight: '536px',
-                    borderRadius: '16px',
-                    overflow: 'hidden',
-                    boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
-                    background: 'white',
-                    position: 'relative'
-                  }}
-                >
-                  {/* Gradient overlay - Pink theme */}
+                {/* Image container with ambient effect */}
+                <div className="relative w-full h-full max-w-[1100px] max-h-[500px]">
+                  {/* Image ambient glow - matches image colors */}
                   <div 
+                    className="absolute -inset-6 rounded-3xl opacity-40"
                     style={{
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      background: 'linear-gradient(135deg, rgba(255, 107, 157, 0.05) 0%, transparent 50%, rgba(255, 107, 157, 0.05) 100%)',
-                      pointerEvents: 'none',
-                      zIndex: 10
+                      background: 'radial-gradient(ellipse at center, rgba(255, 255, 255, 0.8) 0%, rgba(255, 107, 157, 0.1) 50%, transparent 70%)',
+                      filter: 'blur(30px)',
                     }}
                   />
                   
-                  {/* Image */}
-                  <img
-                    src={slides[currentSlide].src}
-                    alt={slides[currentSlide].alt}
-                    draggable={false}
+                  {/* Soft edge fade container */}
+                  <div 
+                    className="relative w-full h-full rounded-2xl overflow-hidden"
                     style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'contain',
-                      display: 'block',
-                      position: 'relative',
-                      zIndex: 1
+                      boxShadow: `
+                        0 0 0 1px rgba(255, 255, 255, 0.5),
+                        0 4px 12px rgba(0, 0, 0, 0.08),
+                        0 8px 24px rgba(255, 107, 157, 0.1),
+                        0 16px 48px rgba(0, 0, 0, 0.1)
+                      `,
                     }}
-                  />
+                  >
+                    {/* White background for image */}
+                    <div className="absolute inset-0 bg-white" />
+                    
+                    {/* Subtle gradient overlay for blending */}
+                    <div 
+                      className="absolute inset-0 pointer-events-none z-10"
+                      style={{
+                        background: `
+                          linear-gradient(to right, rgba(255,255,255,0.3) 0%, transparent 3%, transparent 97%, rgba(255,255,255,0.3) 100%),
+                          linear-gradient(to bottom, rgba(255,255,255,0.3) 0%, transparent 3%, transparent 97%, rgba(255,255,255,0.3) 100%)
+                        `,
+                      }}
+                    />
+                    
+                    {/* Image */}
+                    <img
+                      src={slides[currentSlide].src}
+                      alt={slides[currentSlide].alt}
+                      draggable={false}
+                      className="relative z-[1] w-full h-full object-contain"
+                    />
+                  </div>
                 </div>
               </motion.div>
             </AnimatePresence>
@@ -265,19 +285,20 @@ export default function VascoCarousel({ autoPlayDuration = 20000 }: VascoCarouse
             {/* Navigation Arrows - Pink theme */}
             <button
               onClick={() => paginate(-1)}
-              className="group"
+              className="group absolute left-4 top-1/2 -translate-y-1/2 z-20"
               aria-label="Previous slide"
-              style={{
-                position: 'absolute',
-                left: '16px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                zIndex: 20
-              }}
             >
-              <div className="w-12 h-12 rounded-full bg-white/80 backdrop-blur-md border border-black/10 shadow-lg flex items-center justify-center transition-all duration-300 group-hover:bg-white group-hover:scale-110 group-hover:shadow-xl">
+              <div 
+                className="w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-110"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.9)',
+                  backdropFilter: 'blur(10px)',
+                  border: '1px solid rgba(255, 255, 255, 0.8)',
+                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(255, 107, 157, 0.1)',
+                }}
+              >
                 <svg 
-                  className="w-6 h-6 text-[#FF6B9D] transition-transform group-hover:-translate-x-0.5" 
+                  className="w-5 h-5 text-[#FF6B9D] transition-transform group-hover:-translate-x-0.5" 
                   fill="none" 
                   viewBox="0 0 24 24" 
                   stroke="currentColor"
@@ -289,19 +310,20 @@ export default function VascoCarousel({ autoPlayDuration = 20000 }: VascoCarouse
 
             <button
               onClick={() => paginate(1)}
-              className="group"
+              className="group absolute right-4 top-1/2 -translate-y-1/2 z-20"
               aria-label="Next slide"
-              style={{
-                position: 'absolute',
-                right: '16px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                zIndex: 20
-              }}
             >
-              <div className="w-12 h-12 rounded-full bg-white/80 backdrop-blur-md border border-black/10 shadow-lg flex items-center justify-center transition-all duration-300 group-hover:bg-white group-hover:scale-110 group-hover:shadow-xl">
+              <div 
+                className="w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-110"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.9)',
+                  backdropFilter: 'blur(10px)',
+                  border: '1px solid rgba(255, 255, 255, 0.8)',
+                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(255, 107, 157, 0.1)',
+                }}
+              >
                 <svg 
-                  className="w-6 h-6 text-[#FF6B9D] transition-transform group-hover:translate-x-0.5" 
+                  className="w-5 h-5 text-[#FF6B9D] transition-transform group-hover:translate-x-0.5" 
                   fill="none" 
                   viewBox="0 0 24 24" 
                   stroke="currentColor"
@@ -312,76 +334,59 @@ export default function VascoCarousel({ autoPlayDuration = 20000 }: VascoCarouse
             </button>
 
             {/* Slide Indicators - Pink theme */}
-            <div 
-              style={{
-                position: 'absolute',
-                bottom: '24px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                zIndex: 20,
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}
-            >
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
               {slides.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => goToSlide(index)}
-                  className="group relative"
+                  className="group relative p-1"
                   aria-label={`Go to slide ${index + 1}`}
                 >
-                  {/* Background ring for active indicator */}
+                  <div
+                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                      currentSlide === index
+                        ? 'bg-[#FF6B9D] scale-125'
+                        : 'bg-black/20 group-hover:bg-black/40 group-hover:scale-110'
+                    }`}
+                  />
                   {currentSlide === index && (
                     <motion.div
                       layoutId="activeIndicatorVasco"
+                      className="absolute inset-0 rounded-full"
                       style={{
-                        position: 'absolute',
-                        inset: 0,
                         background: 'rgba(255, 107, 157, 0.2)',
-                        borderRadius: '50%',
-                        padding: '4px'
                       }}
                       transition={{ type: "spring", stiffness: 300, damping: 30 }}
                     />
                   )}
-                  
-                  {/* Dot */}
-                  <div
-                    className={`relative w-2 h-2 rounded-full transition-all duration-300 ${
-                      currentSlide === index
-                        ? 'bg-[#FF6B9D] scale-125'
-                        : 'bg-white/60 group-hover:bg-white/90 group-hover:scale-110'
-                    }`}
-                  />
                 </button>
               ))}
             </div>
 
             {/* Slide Counter & Pause/Play */}
-            <div 
-              style={{
-                position: 'absolute',
-                top: '24px',
-                right: '24px',
-                zIndex: 20,
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px'
-              }}
-            >
-              {/* Counter */}
+            <div className="absolute top-5 right-5 z-20 flex items-center gap-3">
               <div 
-                className="px-4 py-2 rounded-full bg-white/80 backdrop-blur-md border border-black/10 shadow-lg text-sm font-medium text-black/70"
-                style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}
+                className="px-4 py-2 rounded-full text-sm font-medium text-black/60"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.9)',
+                  backdropFilter: 'blur(10px)',
+                  border: '1px solid rgba(255, 255, 255, 0.8)',
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
+                  fontFamily: 'var(--font-geist-sans), sans-serif'
+                }}
               >
                 {currentSlide + 1} / {slides.length}
               </div>
 
-              {/* Pause/Play Button */}
               <button
                 onClick={() => setIsPaused(!isPaused)}
-                className="w-10 h-10 rounded-full bg-white/80 backdrop-blur-md border border-black/10 shadow-lg flex items-center justify-center transition-all duration-300 hover:bg-white hover:scale-110"
+                className="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.9)',
+                  backdropFilter: 'blur(10px)',
+                  border: '1px solid rgba(255, 255, 255, 0.8)',
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
+                }}
                 aria-label={isPaused ? 'Play slideshow' : 'Pause slideshow'}
               >
                 {isPaused ? (
@@ -399,23 +404,16 @@ export default function VascoCarousel({ autoPlayDuration = 20000 }: VascoCarouse
             {/* Progress Bar - Pink theme */}
             {!isPaused && (
               <div 
+                className="absolute bottom-0 left-0 right-0 h-1 z-30 overflow-hidden"
                 style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  height: '4px',
-                  background: 'rgba(255, 255, 255, 0.2)',
-                  zIndex: 30,
-                  borderRadius: '0 0 32px 32px',
-                  overflow: 'hidden'
+                  background: 'rgba(255, 107, 157, 0.1)',
                 }}
               >
                 <motion.div
                   key={currentSlide}
+                  className="h-full"
                   style={{
-                    height: '100%',
-                    background: 'linear-gradient(90deg, #FF6B9D 0%, #C44569 100%)'
+                    background: 'linear-gradient(90deg, #FF6B9D 0%, #ff8fb3 100%)',
                   }}
                   initial={{ width: '0%' }}
                   animate={{ width: '100%' }}
@@ -432,7 +430,7 @@ export default function VascoCarousel({ autoPlayDuration = 20000 }: VascoCarouse
             className="text-sm text-black/40"
             style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}
           >
-            Use arrow keys or drag to navigate • Hover to pause
+            Use arrow keys to navigate • Hover to pause
           </p>
         </div>
       </div>

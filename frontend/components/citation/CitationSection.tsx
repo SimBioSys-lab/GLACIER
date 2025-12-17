@@ -209,27 +209,20 @@ export default function CitationSection() {
             </p>
             <div className="flex flex-wrap gap-3 justify-center">
               <a
-                href="#"
+                href="https://pubmed.ncbi.nlm.nih.gov/33319171/"
+                target="_blank"
                 className="text-sm text-[#8B7DFF] hover:text-[#7B6DFF] hover:underline underline-offset-4 transition-colors font-medium"
                 style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}
               >
-                Ensemble-based protein analysis (2024)
+                Quantification of the Resilience and Vulnerability of HIV-1 Native Glycan Shield at Atomistic Detail
               </a>
-              <span className="text-[#1A1A1A]/30">•</span>
               <a
-                href="#"
+                href="https://pubmed.ncbi.nlm.nih.gov/33093196/"
+                target="_blank"
                 className="text-sm text-[#8B7DFF] hover:text-[#7B6DFF] hover:underline underline-offset-4 transition-colors font-medium"
                 style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}
               >
-                GEF methodology paper (2024)
-              </a>
-              <span className="text-[#1A1A1A]/30">•</span>
-              <a
-                href="#"
-                className="text-sm text-[#8B7DFF] hover:text-[#7B6DFF] hover:underline underline-offset-4 transition-colors font-medium"
-                style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}
-              >
-                Glycan shield dynamics (2023)
+                Visualization of the HIV-1 Env glycan shield across scales
               </a>
             </div>
           </div>
