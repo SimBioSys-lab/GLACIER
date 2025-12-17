@@ -6,6 +6,7 @@ import Footer from "@/components/layout/Footer"
 import VideoHeroSection from "@/components/hero/VideoHeroSection"
 import CitationSection from "@/components/citation/CitationSection"
 import CitationWidget from "@/components/citation/CitationWidget"
+import FreeAccessSection from "@/components/FreeAccessSection"
 
 export default function CicadaSimBioSysInterface() {
   const scrollToCitation = () => {
@@ -26,6 +27,9 @@ export default function CicadaSimBioSysInterface() {
         <div id="citation">
           <CitationSection />
         </div>
+
+        {/* Free Access Statement */}
+        <FreeAccessSection />
 
         {/* Footer Section */}
         <Footer />
