@@ -22,10 +22,10 @@ export default function ParatopeCitation() {
   author = {{SimBioSys Lab}},
   organization = {Northeastern University},
   year = {2025},
-  url = {https://glacier.simbiosys.org/vasco},
+  url = {https://glacier-simbiosys.com/vasco},
   note = {MSA-powered antibody interface prediction}
 }`,
-    apa: `SimBioSys Lab. (2025). VASCO: Viral Antibody Structural Complex Analysis via GLACIER Platform [Computer software]. Northeastern University. https://glacier.simbiosys.org/vasco`
+    apa: `SimBioSys Lab. (2025). VASCO: Viral Antibody Structural Complex Analysis via GLACIER Platform [Computer software]. Northeastern University. https://glacier-simbiosys.com/vasco`
   }
 
   const formatLabels = {

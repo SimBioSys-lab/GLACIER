@@ -15,35 +15,47 @@ export default function GlycoShieldCarousel({ autoPlayDuration = 20000 }: GlycoS
   const slides = [
     {
       src: '/assets/images/glcyoshield/Slide1.png',
-      alt: 'GlycoShield Overview - Slide 1'
+      alt: 'The Viral Glycan Shield',
+      title: 'The Viral Glycan Shield'
     },
     {
       src: '/assets/images/glcyoshield/Slide2.png',
-      alt: 'GlycoShield Analysis - Slide 2'
+      alt: 'Dynamics drives shielding',
+      title: 'The Viral Glycan Shield',
+      subtitle: 'Dynamics drives shielding'
     },
     {
       src: '/assets/images/glcyoshield/Slide3.png',
-      alt: 'GlycoShield Methodology - Slide 3'
+      alt: 'High-throughput pipeline',
+      title: 'Our High-throughput Pipeline',
+      subtitle: 'Generate glycan ensemble at atomistic detail'
     },
     {
       src: '/assets/images/glcyoshield/Slide4.png',
-      alt: 'GlycoShield Results - Slide 4'
+      alt: 'Glycan Shield topological network',
+      title: 'Glycan Shield Topological Network'
     },
     {
       src: '/assets/images/glcyoshield/Slide5.png',
-      alt: 'GlycoShield Visualization - Slide 5'
+      alt: 'Describing glycan shield topology',
+      title: 'Describing the Glycan Shield Topology',
+      subtitle: 'As a network'
     },
     {
       src: '/assets/images/glcyoshield/Slide6.png',
-      alt: 'GlycoShield Network - Slide 6'
+      alt: 'Communities of glycan subdomains',
+      title: 'Communities of Glycan Subdomains'
     },
     {
       src: '/assets/images/glcyoshield/Slide7.png',
-      alt: 'GlycoShield Applications - Slide 7'
+      alt: 'Quantifying the shielding effect',
+      title: 'Quantifying the Shielding Effect'
     },
     {
       src: '/assets/images/glcyoshield/Slide8.png',
-      alt: 'GlycoShield Summary - Slide 8'
+      alt: 'Example GEF surfaces',
+      title: 'Example GEF Surfaces',
+      subtitle: 'Using our pipeline'
     }
   ]
 
@@ -119,6 +131,34 @@ export default function GlycoShieldCarousel({ autoPlayDuration = 20000 }: GlycoS
           >
             Explore our computational pipeline for ensemble-based glycan shielding analysis
           </p>
+        </div>
+
+        {/* Slide Title - Above Carousel */}
+        <div className="text-center mb-6">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentSlide}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ duration: 0.3 }}
+            >
+              <h3 
+                className="text-2xl md:text-3xl font-semibold text-[#2D2A5F] mb-2"
+                style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}
+              >
+                {currentSlide + 1}. {slides[currentSlide].title}
+              </h3>
+              {slides[currentSlide].subtitle && (
+                <p 
+                  className="text-base md:text-lg text-black/60 max-w-3xl mx-auto"
+                  style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}
+                >
+                  {slides[currentSlide].subtitle}
+                </p>
+              )}
+            </motion.div>
+          </AnimatePresence>
         </div>
 
         {/* Carousel Container - Custom Glass Effect */}

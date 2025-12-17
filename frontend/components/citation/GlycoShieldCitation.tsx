@@ -22,10 +22,10 @@ export default function GlycoShieldCitation() {
   author = {{SimBioSys Lab}},
   organization = {Northeastern University},
   year = {2025},
-  url = {https://glacier.simbiosys.org/glycoshield},
+  url = {https://glacier-simbiosys.com/glycoshield},
   note = {Ensemble-based geometric exposure analysis}
 }`,
-    apa: `SimBioSys Lab. (2025). GlycoShield Analysis via GLACIER Platform [Computer software]. Northeastern University. https://glacier.simbiosys.org/glycoshield`
+    apa: `SimBioSys Lab. (2025). GlycoShield Analysis via GLACIER Platform [Computer software]. Northeastern University. https://glacier-simbiosys.com/glycoshield`
   }
 
   const formatLabels = {

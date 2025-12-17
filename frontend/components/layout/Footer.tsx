@@ -7,7 +7,7 @@ export default function Footer() {
   return (
     <footer className="bg-[#1A1A1A] border-t border-[#1A1A1A]/10">
       <div className="container mx-auto px-6 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
           <div className="col-span-1 md:col-span-2">
             <h3 className="text-2xl font-light text-white mb-2">
               GLACIER
@@ -41,6 +41,21 @@ export default function Footer() {
               </li>
               <li>
                 GEF Analysis
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-white font-medium mb-4">VASCO</h4>
+            <ul className="space-y-2 text-white/70">
+              <li>
+                Paratope Prediction
+              </li>
+              <li>
+                Epitope Prediction
+              </li>
+              <li>
+                Interface Analysis
               </li>
             </ul>
           </div>

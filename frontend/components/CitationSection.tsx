@@ -24,7 +24,7 @@ export default function CitationSection() {
   author = {{SimBioSys Lab}},
   organization = {Northeastern University},
   year = {2025},
-  url = {https://glacier.simbiosys.org},
+  url = {https://glacier-simbiosys.com},
   note = {Version 1.0}
 }`,
     endnote: `%0 Computer Program
@@ -32,10 +32,10 @@ export default function CitationSection() {
 %A SimBioSys Lab
 %I Northeastern University
 %D 2025
-%U https://glacier.simbiosys.org
+%U https://glacier-simbiosys.com
 %Z Version 1.0`,
-    apa: `SimBioSys Lab. (2025). GLACIER: A comprehensive platform for ensemble-based geometric exposure analysis of glycosylated proteins (Version 1.0) [Computer software]. Northeastern University. https://glacier.simbiosys.org`,
-    mla: `SimBioSys Lab. "GLACIER: A comprehensive platform for ensemble-based geometric exposure analysis of glycosylated proteins." Version 1.0, Northeastern University, 2025, glacier.simbiosys.org.`
+    apa: `SimBioSys Lab. (2025). GLACIER: A comprehensive platform for ensemble-based geometric exposure analysis of glycosylated proteins (Version 1.0) [Computer software]. Northeastern University. https://glacier-simbiosys.com`,
+    mla: `SimBioSys Lab. "GLACIER: A comprehensive platform for ensemble-based geometric exposure analysis of glycosylated proteins." Version 1.0, Northeastern University, 2025, glacier-simbiosys.com.`
   }
 
   const formatLabels = {

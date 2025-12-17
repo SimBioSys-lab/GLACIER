@@ -15,35 +15,51 @@ export default function VascoCarousel({ autoPlayDuration = 20000 }: VascoCarouse
   const slides = [
     {
       src: '/assets/images/vasco/Slide1.png',
-      alt: 'VASCO Overview - Slide 1'
+      alt: 'VASCO Overview',
+      title: 'VASCO Overview',
+      subtitle: 'Placeholder - update with actual title'
     },
     {
       src: '/assets/images/vasco/Slide2.png',
-      alt: 'VASCO Analysis - Slide 2'
+      alt: 'VASCO Analysis',
+      title: 'VASCO Analysis',
+      subtitle: 'Placeholder - update with actual title'
     },
     {
       src: '/assets/images/vasco/Slide3.png',
-      alt: 'VASCO Methodology - Slide 3'
+      alt: 'VASCO Methodology',
+      title: 'VASCO Methodology',
+      subtitle: 'Placeholder - update with actual title'
     },
     {
       src: '/assets/images/vasco/Slide4.png',
-      alt: 'VASCO Results - Slide 4'
+      alt: 'VASCO Results',
+      title: 'VASCO Results',
+      subtitle: 'Placeholder - update with actual title'
     },
     {
       src: '/assets/images/vasco/Slide5.png',
-      alt: 'VASCO Predictions - Slide 5'
+      alt: 'VASCO Predictions',
+      title: 'VASCO Predictions',
+      subtitle: 'Placeholder - update with actual title'
     },
     {
       src: '/assets/images/vasco/Slide6.png',
-      alt: 'VASCO Interface - Slide 6'
+      alt: 'VASCO Interface',
+      title: 'VASCO Interface',
+      subtitle: 'Placeholder - update with actual title'
     },
     {
       src: '/assets/images/vasco/Slide7.png',
-      alt: 'VASCO Applications - Slide 7'
+      alt: 'VASCO Applications',
+      title: 'VASCO Applications',
+      subtitle: 'Placeholder - update with actual title'
     },
     {
       src: '/assets/images/vasco/Slide8.png',
-      alt: 'VASCO Summary - Slide 8'
+      alt: 'VASCO Summary',
+      title: 'VASCO Summary',
+      subtitle: 'Placeholder - update with actual title'
     }
   ]
 
@@ -119,6 +135,34 @@ export default function VascoCarousel({ autoPlayDuration = 20000 }: VascoCarouse
           >
             AI-powered antibody-antigen interface prediction for vaccine design
           </p>
+        </div>
+
+        {/* Slide Title - Above Carousel */}
+        <div className="text-center mb-6">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentSlide}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ duration: 0.3 }}
+            >
+              <h3 
+                className="text-2xl md:text-3xl font-semibold text-[#2D2A5F] mb-2"
+                style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}
+              >
+                {currentSlide + 1}. {slides[currentSlide].title}
+              </h3>
+              {slides[currentSlide].subtitle && (
+                <p 
+                  className="text-base md:text-lg text-black/60 max-w-3xl mx-auto"
+                  style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}
+                >
+                  {slides[currentSlide].subtitle}
+                </p>
+              )}
+            </motion.div>
+          </AnimatePresence>
         </div>
 
         {/* Carousel Container - Custom Glass Effect with Pink Theme */}
