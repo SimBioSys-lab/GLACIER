@@ -1,8 +1,10 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
-import ProteinViewer from './protein-viewer';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import ErrorBoundary from './error-boundary';
+
+// Lazy load the Molstar viewer
+const MolstarViewer = lazy(() => import('./protein-viewer/MolstarViewer'));
 
 interface FilePreviewProps {
   file: File;
@@ -18,27 +20,15 @@ const FilePreview: React.FC<FilePreviewProps> = ({ file, folderName, index, tota
   const [fileType, setFileType] = useState('unknown');
   const [isPdb, setIsPdb] = useState(false);
   const [expanded, setExpanded] = useState(false);
-  const [visualizationStyle, setVisualizationStyle] = useState('cartoon');
-
-  // Visualization style options
-  const visualizationOptions = [
-    { value: 'cartoon', label: 'Cartoon' },
-    { value: 'backbone', label: 'Backbone' },
-    { value: 'ballAndStick', label: 'Ball & Stick' },
-    { value: 'spacefill', label: 'Space Filling' }
-  ];
 
   // Set height based on total files and whether this one is expanded
   const getPreviewHeight = () => {
-    if (expanded) return '400px';
-    
-    // Determine the height based on how many PDB files we have
-    const pdbCount = Math.min(totalFiles, 4); // Cap at 4 for layout purposes
-    
-    if (pdbCount <= 1) return '300px';
-    if (pdbCount === 2) return '250px';
-    if (pdbCount === 3) return '200px';
-    return '180px'; // 4 or more
+    if (expanded) return '500px';
+    const pdbCount = Math.min(totalFiles, 4);
+    if (pdbCount <= 1) return '400px';
+    if (pdbCount === 2) return '300px';
+    if (pdbCount === 3) return '250px';
+    return '220px';
   };
 
   useEffect(() => {
@@ -47,17 +37,14 @@ const FilePreview: React.FC<FilePreviewProps> = ({ file, folderName, index, tota
       return;
     }
 
-    // Reset state for new file
     setIsLoading(true);
     setError(null);
     setFileContent(null);
     
-    // Determine file type based on extension
     const extension = file.name.split('.').pop()?.toLowerCase();
     setFileType(extension || 'unknown');
     setIsPdb(extension === 'pdb');
 
-    // Only try to read PDB files for visualization
     if (extension === 'pdb') {
       try {
         const reader = new FileReader();
@@ -92,133 +79,115 @@ const FilePreview: React.FC<FilePreviewProps> = ({ file, folderName, index, tota
         setIsLoading(false);
       }
     } else {
-      // For non-PDB files, just show file info
       setIsLoading(false);
     }
   }, [file]);
 
-  // Skip non-PDB files entirely
+  // Skip non-PDB files
   if (!file || !file.name.toLowerCase().endsWith('.pdb')) {
     return null;
   }
 
-  // Get file size in appropriate units
   const getFormattedSize = (bytes: number) => {
     if (bytes < 1024) return `${bytes} B`;
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
-  // Toggle expanded state
   const toggleExpanded = () => {
     setExpanded(!expanded);
   };
 
-  // Handle style change
-  const handleStyleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setVisualizationStyle(e.target.value);
-  };
+  const LoadingSpinner = () => (
+    <div className="flex items-center justify-center h-full bg-[#1a1a1a]">
+      <div className="text-center">
+        <div className="w-10 h-10 border-3 border-white/20 border-t-[#8B7DFF] rounded-full animate-spin mx-auto mb-4"></div>
+        <p className="text-white/70 text-sm">Loading viewer...</p>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="mt-4 border border-white/20 rounded-lg overflow-hidden">
-      <div className="bg-white/10 px-4 py-3 border-b border-white/20 flex items-center justify-between">
+    <div className="mt-4 border border-white/20 rounded-xl overflow-hidden shadow-lg">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-[#1a1a1a] to-[#2a2a2a] px-4 py-3 border-b border-white/10 flex items-center justify-between">
         <div className="flex items-center gap-3">
           {folderName && (
-            <span className="text-sm font-semibold bg-[#8B7DFF]/80 px-3 py-1 rounded-full text-white">
+            <span className="text-sm font-semibold bg-gradient-to-r from-[#8B7DFF] to-[#a899ff] px-3 py-1 rounded-full text-white shadow-md">
               {folderName}
             </span>
           )}
           <h3 className="font-medium text-white">{file.name}</h3>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs bg-white/20 px-2 py-1 rounded-full text-white/80">
+          <span className="text-xs bg-white/10 backdrop-blur px-3 py-1.5 rounded-full text-white/80 border border-white/10">
             {getFormattedSize(file.size)}
           </span>
           {isPdb && (
             <button 
               onClick={toggleExpanded} 
-              className="text-xs bg-blue-600/50 hover:bg-blue-600 px-2 py-1 rounded-full text-white/90 transition-colors"
+              className="text-xs bg-[#8B7DFF]/20 hover:bg-[#8B7DFF]/40 px-3 py-1.5 rounded-full text-[#8B7DFF] transition-all duration-200 border border-[#8B7DFF]/30 hover:border-[#8B7DFF]/50"
             >
-              {expanded ? 'Minimize' : 'Expand'}
+              {expanded ? 'Collapse' : 'Expand'}
             </button>
           )}
         </div>
       </div>
       
+      {/* Viewer */}
       <div>
         {isLoading ? (
-          <div className="flex items-center justify-center h-[200px] bg-black/30">
+          <div className="flex items-center justify-center h-[300px] bg-[#1a1a1a]">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-white mx-auto mb-3"></div>
-              <p className="text-white/70 text-sm">Loading preview...</p>
+              <div className="w-10 h-10 border-3 border-white/20 border-t-[#8B7DFF] rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-white/70 text-sm">Loading structure...</p>
             </div>
           </div>
         ) : error ? (
-          <div className="flex items-center justify-center h-[200px] bg-black/30">
-            <div className="text-center text-white/70">
-              <p className="text-red-400">Error loading preview:</p>
-              <p className="mt-2">{error}</p>
+          <div className="flex items-center justify-center h-[300px] bg-[#1a1a1a]">
+            <div className="text-center text-white/70 p-6">
+              <div className="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center mx-auto mb-4">
+                <svg className="w-6 h-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <p className="text-red-400 font-medium">Error loading preview</p>
+              <p className="mt-2 text-sm text-white/50">{error}</p>
             </div>
           </div>
         ) : isPdb && fileContent ? (
-          <div className="relative">
-            <div style={{ height: getPreviewHeight() }}>
-              <ErrorBoundary fallback={
-                <div className="flex items-center justify-center h-full bg-black/30">
-                  <div className="text-center text-white/70">
-                    <p>Error visualizing PDB structure</p>
-                    <p className="mt-2 text-sm text-white/50">
-                      The file format may not be compatible with the 3D viewer
-                    </p>
+          <div className="relative" style={{ height: getPreviewHeight() }}>
+            <ErrorBoundary 
+              fallback={
+                <div className="flex items-center justify-center h-full bg-[#1a1a1a]">
+                  <div className="text-center text-white/70 p-6">
+                    <p className="text-amber-400 mb-2">Viewer unavailable</p>
+                    <p className="text-sm text-white/50">The 3D viewer could not be loaded</p>
                   </div>
                 </div>
-              }>
-                <ProteinViewer 
+              }
+            >
+              <Suspense fallback={<LoadingSpinner />}>
+                <MolstarViewer 
                   pdbData={fileContent} 
                   width="100%" 
                   height="100%"
-                  backgroundColor="#111"
-                  showControls={false} // We'll use our own controls
-                  autoRotate={true}
-                  initialStyle={visualizationStyle}
-                  key={`protein-${index}-${visualizationStyle}`} // Force re-render on style change
+                  backgroundColor="#1a1a1a"
+                  showControls={false}
+                  autoRotate={false}
                 />
-              </ErrorBoundary>
-            </div>
-            
-            {/* Visualization style controls */}
-            <div className="absolute top-3 right-3 z-10">
-              <select
-                value={visualizationStyle}
-                onChange={handleStyleChange}
-                className="bg-black/70 text-white text-xs border border-white/30 rounded px-2 py-1"
-              >
-                {visualizationOptions.map(option => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
+              </Suspense>
+            </ErrorBoundary>
           </div>
         ) : (
-          <div className="flex items-center justify-center h-[150px] bg-black/30">
+          <div className="flex items-center justify-center h-[200px] bg-[#1a1a1a]">
             <div className="text-center text-white/70">
-              {fileType === 'zip' || fileType === 'tar' || fileType === 'gz' || fileType === 'tgz' ? (
-                <>
-                  <p>Archive file ({fileType.toUpperCase()})</p>
-                  <p className="mt-2 text-sm text-white/50">
-                    Contents will be processed after submission
-                  </p>
-                </>
-              ) : (
-                <>
-                  <p>Preview not available for {fileType.toUpperCase()} files</p>
-                  <p className="mt-2 text-sm text-white/50">
-                    File will be processed after submission
-                  </p>
-                </>
-              )}
+              <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center mx-auto mb-4">
+                <svg className="w-6 h-6 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <p className="font-medium">Preview not available</p>
             </div>
           </div>
         )}

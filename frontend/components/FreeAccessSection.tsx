@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 
 export default function FreeAccessSection() {
   return (
-    <section className="py-24 px-6 relative overflow-hidden">
+    <section id="free-access-section" className="py-24 px-6 relative overflow-hidden">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-gray-50/80 via-white to-gray-50/50" />
       

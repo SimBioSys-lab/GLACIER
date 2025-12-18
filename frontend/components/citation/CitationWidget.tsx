@@ -5,7 +5,7 @@ import { Quote, ChevronDown, ChevronUp } from "lucide-react"
 import GlassSurface from '../GlassSurface'
 
 export default function CitationWidget() {
-  const [isOverFooter, setIsOverFooter] = useState(false)
+  const [isOverDarkSection, setIsOverDarkSection] = useState(false)
   const [showTooltip, setShowTooltip] = useState(false)
 
   const scrollToCitation = () => {
@@ -16,30 +16,41 @@ export default function CitationWidget() {
   }
 
   useEffect(() => {
-    const checkFooterOverlap = () => {
+    const checkSectionOverlap = () => {
+      const freeAccessSection = document.getElementById('free-access-section')
       const footer = document.querySelector('footer')
       const widget = document.querySelector('.citation-widget')
       
-      if (footer && widget) {
-        const footerRect = footer.getBoundingClientRect()
+      if (widget) {
         const widgetRect = widget.getBoundingClientRect()
         
-        // Check if widget overlaps with footer
-        const isOverlapping = widgetRect.bottom > footerRect.top
-        setIsOverFooter(isOverlapping)
+        // Check if widget overlaps with Free Access section or footer
+        let isOverlapping = false
+        
+        if (freeAccessSection) {
+          const freeAccessRect = freeAccessSection.getBoundingClientRect()
+          isOverlapping = widgetRect.bottom > freeAccessRect.top
+        }
+        
+        if (!isOverlapping && footer) {
+          const footerRect = footer.getBoundingClientRect()
+          isOverlapping = widgetRect.bottom > footerRect.top
+        }
+        
+        setIsOverDarkSection(isOverlapping)
       }
     }
 
     // Check on scroll and resize
-    window.addEventListener('scroll', checkFooterOverlap)
-    window.addEventListener('resize', checkFooterOverlap)
+    window.addEventListener('scroll', checkSectionOverlap)
+    window.addEventListener('resize', checkSectionOverlap)
     
     // Initial check
-    checkFooterOverlap()
+    checkSectionOverlap()
 
     return () => {
-      window.removeEventListener('scroll', checkFooterOverlap)
-      window.removeEventListener('resize', checkFooterOverlap)
+      window.removeEventListener('scroll', checkSectionOverlap)
+      window.removeEventListener('resize', checkSectionOverlap)
     }
   }, [])
 
@@ -52,9 +63,9 @@ export default function CitationWidget() {
       <GlassSurface
         displace={0.3}
         distortionScale={-100}
-        brightness={isOverFooter ? 85 : 95}
+        brightness={isOverDarkSection ? 85 : 95}
         opacity={0.93}
-        backgroundOpacity={isOverFooter ? 0.2 : 0.1}
+        backgroundOpacity={isOverDarkSection ? 0.2 : 0.1}
         blur={10}
         borderRadius={50}
         borderWidth={0.05}
@@ -66,7 +77,7 @@ export default function CitationWidget() {
             px-5 py-3 flex items-center gap-2
             transition-all duration-300
             hover:scale-105 active:scale-95
-            ${isOverFooter 
+            ${isOverDarkSection 
               ? 'text-white hover:text-[#8B7DFF]' 
               : 'text-[#1A1A1A] hover:text-[#8B7DFF]'
             }
@@ -75,7 +86,7 @@ export default function CitationWidget() {
         >
           <Quote className="w-5 h-5" />
           <span className="text-sm font-semibold">Cite GLACIER</span>
-          {isOverFooter ? (
+          {isOverDarkSection ? (
             <ChevronUp className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" />
           ) : (
             <ChevronDown className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
@@ -93,7 +104,7 @@ export default function CitationWidget() {
       >
         <div className={`
           text-xs px-3 py-1.5 rounded-lg whitespace-nowrap transition-colors duration-300
-          ${isOverFooter 
+          ${isOverDarkSection 
             ? 'bg-white/90 text-[#1A1A1A]' 
             : 'bg-[#1A1A1A]/90 text-white'
           }

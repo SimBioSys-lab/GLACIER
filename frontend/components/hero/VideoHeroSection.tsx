@@ -106,7 +106,7 @@ export default function VideoHeroSection() {
                           onClick={() => handleToolSelect(tool.id)}
                           className={`
                             px-6 py-2.5 rounded-full font-semibold text-sm transition-all duration-300
-                            flex items-center gap-2
+                            flex items-center gap-2 cursor-pointer
                             ${currentSlide === tool.id
                               ? 'bg-white text-black shadow-md scale-105'
                               : 'text-black/60 hover:text-black/80 hover:bg-white/30'
@@ -167,7 +167,7 @@ export default function VideoHeroSection() {
                         <div className="flex items-center gap-4 flex-wrap mt-auto">
                           <button
                             onClick={handleStart}
-                            className="bg-[#8B7DFF] hover:bg-[#7B6DFF] text-white px-8 py-4 rounded-lg font-medium transition-colors duration-150 shadow-lg hover:shadow-xl"
+                            className="bg-[#8B7DFF] hover:bg-[#7B6DFF] text-white px-8 py-4 rounded-lg font-medium transition-colors duration-150 shadow-lg hover:shadow-xl cursor-pointer"
                             style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}
                           >
                             Start GlycoShield Analysis
@@ -175,7 +175,7 @@ export default function VideoHeroSection() {
 
                           <button
                             onClick={() => handleLearnMore('glycoshield')}
-                            className="text-[#8B7DFF] hover:text-[#7B6DFF] font-medium px-4 py-4 transition-colors duration-150 hover:underline underline-offset-4"
+                            className="text-[#8B7DFF] hover:text-[#7B6DFF] font-medium px-4 py-4 transition-colors duration-150 hover:underline underline-offset-4 cursor-pointer"
                             style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}
                           >
                             Learn more
@@ -227,7 +227,7 @@ export default function VideoHeroSection() {
                         <div className="flex items-center gap-4 flex-wrap mt-auto">
                           <button
                             onClick={handleStart}
-                            className="bg-gradient-to-r from-[#FF6B9D] to-[#C44569] hover:from-[#FF5B8D] hover:to-[#B43559] text-white px-8 py-4 rounded-lg font-medium transition-all duration-150 shadow-lg hover:shadow-xl"
+                            className="bg-gradient-to-r from-[#FF6B9D] to-[#C44569] hover:from-[#FF5B8D] hover:to-[#B43559] text-white px-8 py-4 rounded-lg font-medium transition-all duration-150 shadow-lg hover:shadow-xl cursor-pointer"
                             style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}
                           >
                             Predict VASCO
@@ -235,7 +235,7 @@ export default function VideoHeroSection() {
 
                           <button
                             onClick={() => handleLearnMore('vasco')}
-                            className="text-[#FF6B9D] hover:text-[#C44569] font-medium px-4 py-4 transition-colors duration-150 hover:underline underline-offset-4"
+                            className="text-[#FF6B9D] hover:text-[#C44569] font-medium px-4 py-4 transition-colors duration-150 hover:underline underline-offset-4 cursor-pointer"
                             style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}
                           >
                             Learn more
@@ -254,7 +254,7 @@ export default function VideoHeroSection() {
       {/* Scroll indicator */}
       <button
         onClick={scrollToCitation}
-        className="absolute bottom-12 left-1/2 -translate-x-1/2 z-20 animate-bounce"
+        className="absolute bottom-12 left-1/2 -translate-x-1/2 z-20 animate-bounce cursor-pointer"
       >
         <div className="w-6 h-10 border-2 border-[#1A1A1A]/30 rounded-full flex justify-center">
           <div className="w-0.5 h-2 bg-[#1A1A1A]/50 rounded-full mt-2" />
