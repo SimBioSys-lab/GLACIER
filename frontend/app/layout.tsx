@@ -33,6 +33,11 @@ const nothingFont = localFont({
 export const metadata: Metadata = {
   title: "GLACIER - SimBioSys Lab Initiative",
   description: "Computational biology platform for glycoprotein structure analysis",
+  icons: {
+    icon: "/assets/images/G-logo.png",
+    shortcut: "/assets/images/G-logo.png",
+    apple: "/assets/images/G-logo.png",
+  },
 };
 
 export default function RootLayout({
