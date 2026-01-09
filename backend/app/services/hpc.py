@@ -259,8 +259,8 @@ def stage_folders_and_start_pipeline(
     number_of_runs: int,
     gef_probe_radius: int,
     req_user_id: str,
-    email: str,
-    name: str,
+    email: Optional[str],
+    name: Optional[str],
     organization: str,
     description: str,
     folder_configs: Optional[Dict[str, dict]] = None,
@@ -308,9 +308,9 @@ def stage_folders_and_start_pipeline(
             # Save metadata for this folder as metadata.txt (not JSON)
             # This is needed for each individual folder - use folder-specific values
             metadata_txt = f"""USER_ID={req_user_id}
-EMAIL={email}
+EMAIL={email or ''}
 JOB_NAME={folder_name}
-NAME={name}
+NAME={name or ''}
 ORGANIZATION={organization}
 DESCRIPTION={description}
 NUMBER_OF_RUNS={folder_number_of_runs}
@@ -344,9 +344,9 @@ TIMESTAMP={int(time.time())}
         ])
         
         user_metadata_txt = f"""USER_ID={req_user_id}
-EMAIL={email}
+EMAIL={email or ''}
 JOB_NAME={req_user_id}_submission
-NAME={name}
+NAME={name or ''}
 ORGANIZATION={organization}
 DESCRIPTION={description}
 TIMESTAMP={int(time.time())}
@@ -402,8 +402,8 @@ FOLDER_COUNT={len(all_folders)}
             "params": {
                 "number_of_runs": number_of_runs,
                 "gef_probe_radius": gef_probe_radius,
-                "email": email,
-                "name": name,
+                "email": email or '',
+                "name": name or '',
                 "organization": organization,
                 "description": description
             },
