@@ -20,8 +20,8 @@ router = APIRouter()
 @router.post("/upload", response_model=UploadResponse)
 async def upload(
     background: BackgroundTasks,
-    email: str = Form(...),
-    name: str = Form(...),
+    email: Optional[str] = Form(None),
+    name: Optional[str] = Form(None),
     organization: str = Form(""),
     description: str = Form(""),
     numberOfRuns: int = Form(1),
@@ -69,8 +69,8 @@ async def upload(
     timestamp = time.strftime("%Y%m%d%H%M%S")
     with open(os.path.join(user_dir, "user_info.txt"), "w") as f:
         f.write(
-            f"Name: {name}\n"
-            f"Email: {email}\n"
+            f"Name: {name or 'Not provided'}\n"
+            f"Email: {email or 'Not provided'}\n"
             f"Organization: {organization}\n"
             f"Description: {description}\n"
             f"Number of Runs (default): {numberOfRuns}\n"
