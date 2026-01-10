@@ -77,8 +77,21 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-white/10 mt-8 pt-8 text-center">
-          <p className="text-white/60">© 2025 SimBioSys Lab. All rights reserved.</p>
+        <div className="border-t border-white/10 mt-8 pt-8">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-white/60">© 2025 SimBioSys Lab. All rights reserved.</p>
+            <p className="text-white/40 text-sm">
+              <span className="text-white/30">Designed & Developed by</span>{' '}
+              <a 
+                href="https://naveenrm.me/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-white/50 hover:text-[#8B7DFF] transition-colors duration-300"
+              >
+                Naveen Rajagopal Mohanraj
+              </a>
+            </p>
+          </div>
         </div>
       </div>
     </footer>
