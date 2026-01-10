@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import StepIndicator from "@/components/form/StepIndicator"
 import ParatopeStepOne from "./ParatopeStepOne"
-import StepTwo from "@/components/form/StepTwo"
-import type { FormData } from "@/components/form/StepTwo"
+import VascoStepTwo from "./VascoStepTwo"
+import type { FormData } from "./VascoStepTwo"
 
 interface ParatopeMultiStepFormProps {
   onSubmitSuccess: (jobId: string, userId: string, azureUrl?: string) => void
@@ -174,7 +174,7 @@ const ParatopeMultiStepForm = forwardRef<HTMLDivElement, ParatopeMultiStepFormPr
                       exit={{ opacity: 0, x: -20 }}
                       transition={{ duration: 0.3 }}
                     >
-                      <StepTwo
+                      <VascoStepTwo
                         formData={formData}
                         onFormDataChange={setFormData}
                       />

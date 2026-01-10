@@ -13,12 +13,12 @@ export interface FormData {
   description: string
 }
 
-interface StepTwoProps {
+interface VascoStepTwoProps {
   formData: FormData
   onFormDataChange: (data: FormData) => void
 }
 
-export default function StepTwo({ formData, onFormDataChange }: StepTwoProps) {
+export default function VascoStepTwo({ formData, onFormDataChange }: VascoStepTwoProps) {
   const handleChange = (field: keyof FormData) => (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -37,7 +37,7 @@ export default function StepTwo({ formData, onFormDataChange }: StepTwoProps) {
         <p className="text-[#1A1A1A]/70 mt-2">
           Optionally provide your contact details for the analysis results
         </p>
-        <p className="text-sm text-[#8B7DFF] font-medium mt-1">
+        <p className="text-sm text-[#FF6B9D] font-medium mt-1">
           All fields are optional - you can submit without filling any information
         </p>
       </div>
@@ -64,7 +64,7 @@ export default function StepTwo({ formData, onFormDataChange }: StepTwoProps) {
           value={formData.fullName}
           onChange={handleChange('fullName')}
           placeholder="Enter your full name"
-          className="bg-white/70 border-[#1A1A1A]/20 text-[#1A1A1A] placeholder-[#1A1A1A]/50 text-lg p-4 focus:border-[#8B7DFF] focus:ring-[#8B7DFF]/20"
+          className="bg-white/70 border-[#1A1A1A]/20 text-[#1A1A1A] placeholder-[#1A1A1A]/50 text-lg p-4 focus:border-[#FF6B9D] focus:ring-[#FF6B9D]/20"
         />
       </div>
 
@@ -81,7 +81,7 @@ export default function StepTwo({ formData, onFormDataChange }: StepTwoProps) {
           value={formData.email}
           onChange={handleChange('email')}
           placeholder="your.email@example.com"
-          className="bg-white/70 border-[#1A1A1A]/20 text-[#1A1A1A] placeholder-[#1A1A1A]/50 text-lg p-4 focus:border-[#8B7DFF] focus:ring-[#8B7DFF]/20"
+          className="bg-white/70 border-[#1A1A1A]/20 text-[#1A1A1A] placeholder-[#1A1A1A]/50 text-lg p-4 focus:border-[#FF6B9D] focus:ring-[#FF6B9D]/20"
         />
         <p className="text-sm text-[#1A1A1A]/60">
           Provide an email if you'd like to receive the analysis results
@@ -101,7 +101,7 @@ export default function StepTwo({ formData, onFormDataChange }: StepTwoProps) {
           value={formData.organization}
           onChange={handleChange('organization')}
           placeholder="University or Company Name"
-          className="bg-white/70 border-[#1A1A1A]/20 text-[#1A1A1A] placeholder-[#1A1A1A]/50 text-lg p-4 focus:border-[#8B7DFF] focus:ring-[#8B7DFF]/20"
+          className="bg-white/70 border-[#1A1A1A]/20 text-[#1A1A1A] placeholder-[#1A1A1A]/50 text-lg p-4 focus:border-[#FF6B9D] focus:ring-[#FF6B9D]/20"
         />
       </div>
 
@@ -118,7 +118,7 @@ export default function StepTwo({ formData, onFormDataChange }: StepTwoProps) {
           onChange={handleChange('description')}
           placeholder="Brief description of your research project..."
           rows={4}
-          className="bg-white/70 border-[#1A1A1A]/20 text-[#1A1A1A] placeholder-[#1A1A1A]/50 text-lg p-4 focus:border-[#8B7DFF] focus:ring-[#8B7DFF]/20 resize-none"
+          className="bg-white/70 border-[#1A1A1A]/20 text-[#1A1A1A] placeholder-[#1A1A1A]/50 text-lg p-4 focus:border-[#FF6B9D] focus:ring-[#FF6B9D]/20 resize-none"
         />
       </div>
 

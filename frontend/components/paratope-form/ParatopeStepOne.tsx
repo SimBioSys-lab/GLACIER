@@ -1,11 +1,12 @@
 "use client"
 
 import React, { useState } from "react"
-import { Upload, FileText, Info, X } from "lucide-react"
+import { Upload, FileText, Info, X, ChevronDown, ChevronRight, BookOpen, AlertTriangle, Zap, FlaskRound, Download } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card } from "@/components/ui/card"
+import { loadVascoExampleFiles, isVascoExampleData, VASCO_EXAMPLE_DATA } from "@/services/vascoExampleDataService"
 
 interface ParatopeStepOneProps {
   antibodyFile: File | null
@@ -33,6 +34,69 @@ export default function ParatopeStepOne({
   onAntigenChainsChange,
 }: ParatopeStepOneProps) {
   const [dragActive, setDragActive] = useState<'antibody' | 'antigen' | null>(null)
+  const [expandedDocs, setExpandedDocs] = useState<Set<string>>(new Set())
+  const [isLoadingExample, setIsLoadingExample] = useState(false)
+  const [isExample, setIsExample] = useState(false)
+
+  // Helper function to download example files
+  const downloadExampleFiles = () => {
+    const files = [
+      { url: '/examples/2B4C/antibody.pdb', name: 'antibody.pdb' },
+      { url: '/examples/2B4C/antigen.pdb', name: 'antigen.pdb' }
+    ]
+    files.forEach((file, index) => {
+      setTimeout(() => {
+        const a = document.createElement('a')
+        a.href = file.url
+        a.download = file.name
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+      }, index * 300)
+    })
+  }
+
+  // Load example files
+  const handleLoadExample = async () => {
+    setIsLoadingExample(true)
+    try {
+      const exampleData = await loadVascoExampleFiles()
+      onAntibodyChange(exampleData.antibodyFile)
+      onAntigenChange(exampleData.antigenFile)
+      onLightChainChange(exampleData.lightChain)
+      onHeavyChainChange(exampleData.heavyChain)
+      onAntigenChainsChange(exampleData.antigenChains)
+      setIsExample(true)
+      console.log('VASCO example files loaded successfully')
+    } catch (error) {
+      console.error('Failed to load example files:', error)
+      alert('Failed to load example files. Please try again.')
+    } finally {
+      setIsLoadingExample(false)
+    }
+  }
+
+  // Clear example data
+  const clearExample = () => {
+    onAntibodyChange(null)
+    onAntigenChange(null)
+    onLightChainChange('L')
+    onHeavyChainChange('H')
+    onAntigenChainsChange('')
+    setIsExample(false)
+  }
+
+  const toggleDocSection = (section: string) => {
+    setExpandedDocs(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(section)) {
+        newSet.delete(section)
+      } else {
+        newSet.add(section)
+      }
+      return newSet
+    })
+  }
 
   const handleDrag = (e: React.DragEvent, type: 'antibody' | 'antigen') => {
     e.preventDefault()
@@ -76,6 +140,10 @@ export default function ParatopeStepOne({
     } else {
       onAntigenChange(null)
     }
+    // If removing a file, clear example state
+    if (isExample) {
+      setIsExample(false)
+    }
   }
 
   return (
@@ -89,6 +157,45 @@ export default function ParatopeStepOne({
           Upload antibody and antigen PDB files. VASCO uses MSA-powered neural networks to predict interface residues.
         </p>
       </div>
+
+      {/* Example Data Banner */}
+      {isExample && (
+        <div className="bg-gradient-to-r from-[#FF6B9D]/10 to-[#8B7DFF]/10 border border-[#FF6B9D]/30 rounded-lg p-4">
+          <div className="flex items-center gap-3">
+            <FlaskRound className="w-5 h-5 text-[#FF6B9D]" />
+            <div className="flex-1">
+              <h4 className="text-sm font-medium text-[#1A1A1A]">
+                Viewing Example Data: {VASCO_EXAMPLE_DATA.name}
+              </h4>
+              <p className="text-xs text-[#1A1A1A]/70 mt-1">
+                {VASCO_EXAMPLE_DATA.description}
+              </p>
+              <div className="flex items-center gap-2 mt-2">
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={downloadExampleFiles}
+                  className="bg-[#FF6B9D] hover:bg-[#FF6B9D]/90 text-white text-xs"
+                >
+                  <Download className="w-3 h-3 mr-1" />
+                  Download Example Files
+                </Button>
+                <p className="text-xs text-[#1A1A1A]/60">
+                  Download both PDB files to your computer
+                </p>
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={clearExample}
+              className="text-xs text-[#1A1A1A]/60 hover:text-[#1A1A1A]"
+            >
+              Clear Example
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Info Banner */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -104,6 +211,154 @@ export default function ParatopeStepOne({
           </div>
         </div>
       </div>
+
+      {/* Processing Time Notice */}
+      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3">
+        <Info className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
+        <div className="text-sm text-amber-800">
+          <p className="font-medium">Processing Time & Results</p>
+          <p className="mt-1">VASCO analysis typically completes within 4-8 hours. This includes MSA generation, deep learning inference, and result visualization. A results link will be provided immediately upon submission where you can check the status and access your results once ready.</p>
+        </div>
+      </div>
+
+      {/* Documentation Section - Collapsible */}
+      <div className="border border-[#1A1A1A]/10 rounded-lg overflow-hidden">
+        <button
+          onClick={() => toggleDocSection('documentation')}
+          className="w-full flex items-center justify-between p-4 bg-[#F5F4F9]/50 hover:bg-[#F5F4F9] transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            <BookOpen className="w-5 h-5 text-[#FF6B9D]" />
+            <span className="font-medium text-[#1A1A1A]">VASCO Documentation & Input Requirements</span>
+          </div>
+          {expandedDocs.has('documentation') ? (
+            <ChevronDown className="w-5 h-5 text-[#1A1A1A]/60" />
+          ) : (
+            <ChevronRight className="w-5 h-5 text-[#1A1A1A]/60" />
+          )}
+        </button>
+        
+        {expandedDocs.has('documentation') && (
+          <div className="p-4 bg-white space-y-6 text-sm text-[#1A1A1A]/80">
+            {/* Overview */}
+            <div>
+              <h4 className="font-semibold text-[#1A1A1A] mb-2">What is VASCO?</h4>
+              <p className="leading-relaxed">
+                VASCO (Viral Antibody Structural Complex Analysis) is a structure-based computational platform for predicting antibody–antigen binding interfaces. It identifies both paratope residues on antibodies and epitope residues on antigens, providing rapid, interpretable insights into molecular recognition that can guide experimental design, antibody engineering, and vaccine development.
+              </p>
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-[#1A1A1A] mb-2">How It Works</h4>
+              <p className="leading-relaxed">
+                VASCO integrates sequence-derived features, structural context, and learned attention and masking mechanisms. The model uses graph neural networks trained on known antibody-antigen complexes to predict binding probability scores for each residue. Because it integrates multiple types of information, its predictions are not only accurate but also biophysically interpretable.
+              </p>
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-[#1A1A1A] mb-2 flex items-center gap-2">
+                <Zap className="w-4 h-4 text-[#FF6B9D]" />
+                What You Get
+              </h4>
+              <div className="bg-[#F5F4F9]/50 p-3 rounded-lg">
+                <ul className="list-disc list-inside space-y-1 text-[#1A1A1A]/70">
+                  <li>Binding probability scores for each residue on antibody and antigen</li>
+                  <li>Identification of likely paratope and epitope residues</li>
+                  <li>Relative importance of residues derived from learned masking mechanisms</li>
+                  <li>Visualizations directly mappable to protein structures</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Antibody PDB documentation */}
+            <div className="border-t border-[#1A1A1A]/10 pt-4">
+              <h4 className="font-semibold text-[#FF6B9D] mb-2 flex items-center gap-2">
+                <FileText className="w-4 h-4" />
+                Required Input: Antibody PDB
+              </h4>
+              <p className="leading-relaxed mb-3">
+                The antibody Fab structure containing the heavy and light chains.
+              </p>
+              <div className="bg-[#F5F4F9]/50 p-3 rounded-lg space-y-2">
+                <p className="font-medium text-[#1A1A1A]">Requirements:</p>
+                <ul className="list-disc list-inside space-y-1 text-[#1A1A1A]/70">
+                  <li>Standard PDB format file</li>
+                  <li>Must contain <strong>Heavy Chain (H)</strong> - typically chain ID "H"</li>
+                  <li>Must contain <strong>Light Chain (L)</strong> - typically chain ID "L"</li>
+                  <li>Can be experimentally determined (X-ray, cryo-EM, NMR) or computationally predicted (AlphaFold, homology modeling)</li>
+                </ul>
+              </div>
+              <div className="mt-3 bg-orange-50 border border-orange-200 p-3 rounded-lg">
+                <div className="flex items-start gap-2">
+                  <AlertTriangle className="w-4 h-4 text-orange-600 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="font-medium text-orange-800">Important: Chain IDs</p>
+                    <p className="text-orange-700 text-xs mt-1">
+                      Ensure you specify the correct chain IDs for heavy and light chains. The default is H for heavy and L for light, but your PDB may use different identifiers. Check your PDB file to confirm.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Antigen PDB documentation */}
+            <div className="border-t border-[#1A1A1A]/10 pt-4">
+              <h4 className="font-semibold text-[#FF6B9D] mb-2 flex items-center gap-2">
+                <FileText className="w-4 h-4" />
+                Required Input: Antigen PDB
+              </h4>
+              <p className="leading-relaxed mb-3">
+                The antigen structure corresponding to the viral protein of interest.
+              </p>
+              <div className="bg-[#F5F4F9]/50 p-3 rounded-lg space-y-2">
+                <p className="font-medium text-[#1A1A1A]">Requirements:</p>
+                <ul className="list-disc list-inside space-y-1 text-[#1A1A1A]/70">
+                  <li>Standard PDB format file</li>
+                  <li>Can contain single or multiple chains</li>
+                  <li>Specify antigen chain IDs if the structure contains multiple chains</li>
+                  <li>Can be experimentally determined or computationally predicted</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Use Cases */}
+            <div className="border-t border-[#1A1A1A]/10 pt-4">
+              <h4 className="font-semibold text-[#1A1A1A] mb-2">Use Cases</h4>
+              <div className="bg-[#F5F4F9]/50 p-3 rounded-lg">
+                <ul className="list-disc list-inside space-y-2 text-[#1A1A1A]/70">
+                  <li><strong>Prediction:</strong> Identify likely binding interfaces for new antibody–antigen pairs</li>
+                  <li><strong>Screening:</strong> Compare multiple antibodies or antigen variants to prioritize candidates</li>
+                  <li><strong>Hypothesis generation:</strong> Suggest mutations, validate experimental observations, or explore alternative binding modes</li>
+                  <li><strong>Vaccine design:</strong> Identify epitope regions for immunogen development</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Try Example Run - shown when no files uploaded */}
+      {!antibodyFile && !antigenFile && (
+        <div className="text-center">
+          <button
+            onClick={handleLoadExample}
+            disabled={isLoadingExample}
+            className="text-[#FF6B9D] hover:text-[#FF6B9D]/80 underline text-sm transition-colors disabled:opacity-50 inline-flex items-center gap-2"
+          >
+            {isLoadingExample ? (
+              <>
+                <span className="animate-spin">⏳</span>
+                Loading example...
+              </>
+            ) : (
+              <>
+                <FlaskRound className="w-4 h-4" />
+                Try an example run
+              </>
+            )}
+          </button>
+        </div>
+      )}
 
       {/* Antibody Upload */}
       <div className="space-y-4">

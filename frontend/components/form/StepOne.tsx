@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
-import { Upload, X, Folder, ChevronDown, ChevronRight, File, AlertCircle, FlaskRound, Download, Settings } from "lucide-react"
+import { Upload, X, Folder, ChevronDown, ChevronRight, File, AlertCircle, FlaskRound, Download, Settings, BookOpen, FileText, ExternalLink, AlertTriangle, Info } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -186,10 +186,23 @@ export default function StepOne({
   onFormDataChange
 }: StepOneProps) {
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
+  const [expandedDocs, setExpandedDocs] = useState<Set<string>>(new Set());
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [isLoadingExample, setIsLoadingExample] = useState(false);
   const [isExample, setIsExample] = useState(false);
   const [isDownloadingExample, setIsDownloadingExample] = useState(false);
+
+  const toggleDocSection = (section: string) => {
+    setExpandedDocs(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(section)) {
+        newSet.delete(section)
+      } else {
+        newSet.add(section)
+      }
+      return newSet
+    })
+  };
 
   // Parse input.dat files when folders change
   useEffect(() => {
@@ -421,6 +434,195 @@ export default function StepOne({
         <p className="text-sm text-[#8B7DFF] font-medium mt-1">
           ⚡ Each folder can have its own configuration (NRUNS, GEF Probe Radius, Attach Gaps)
         </p>
+      </div>
+
+      {/* Processing Time Notice */}
+      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3">
+        <Info className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
+        <div className="text-sm text-amber-800">
+          <p className="font-medium">Processing Time & Results</p>
+          <p className="mt-1">The complete analysis, including ensemble modeling and full structural analysis, can take up to 24 hours. A results link will be provided immediately upon submission where you can check the status and access your results once ready.</p>
+        </div>
+      </div>
+
+      {/* GlycoShield Papers */}
+      <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+        <div className="flex items-start gap-3">
+          <BookOpen className="w-5 h-5 text-purple-600 mt-0.5 flex-shrink-0" />
+          <div className="text-sm text-purple-800 flex-1">
+            <p className="font-medium mb-2">Related Publications</p>
+            <p className="mb-3">If you use GLACIER in your research, please cite our related publications:</p>
+            <div className="space-y-2">
+              <a 
+                href="https://pubmed.ncbi.nlm.nih.gov/33319171/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-purple-700 hover:text-purple-900 hover:underline"
+              >
+                <ExternalLink className="w-4 h-4 flex-shrink-0" />
+                <span>Quantification of the Resilience and Vulnerability of HIV-1 Native Glycan Shield at Atomistic Detail</span>
+              </a>
+              <a 
+                href="https://pubmed.ncbi.nlm.nih.gov/33093196/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-purple-700 hover:text-purple-900 hover:underline"
+              >
+                <ExternalLink className="w-4 h-4 flex-shrink-0" />
+                <span>Visualization of the HIV-1 Env glycan shield across scales</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Documentation Section - Collapsible */}
+      <div className="border border-[#1A1A1A]/10 rounded-lg overflow-hidden">
+        <button
+          onClick={() => toggleDocSection('documentation')}
+          className="w-full flex items-center justify-between p-4 bg-[#F5F4F9]/50 hover:bg-[#F5F4F9] transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            <BookOpen className="w-5 h-5 text-[#8B7DFF]" />
+            <span className="font-medium text-[#1A1A1A]">GlycoShield Documentation & File Requirements</span>
+          </div>
+          {expandedDocs.has('documentation') ? (
+            <ChevronDown className="w-5 h-5 text-[#1A1A1A]/60" />
+          ) : (
+            <ChevronRight className="w-5 h-5 text-[#1A1A1A]/60" />
+          )}
+        </button>
+        
+        {expandedDocs.has('documentation') && (
+          <div className="p-4 bg-white space-y-6 text-sm text-[#1A1A1A]/80">
+            {/* Overview */}
+            <div>
+              <h4 className="font-semibold text-[#1A1A1A] mb-2">The Glycan Shield Challenge</h4>
+              <p className="leading-relaxed">
+                Many clinically important enveloped viruses mask their surface proteins with a dense layer of host-derived sugars, known as the glycan shield. This sugar coating acts as a powerful immune evasion mechanism by sterically blocking antibody access to the underlying protein surface. Because these surface glycoproteins are the primary targets of neutralizing antibodies and vaccines, understanding how glycan shielding operates is central to rational immunogen design.
+              </p>
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-[#1A1A1A] mb-2">Ensemble-Based Atomistic Modeling</h4>
+              <p className="leading-relaxed">
+                This platform employs an ensemble-based atomistic modeling approach (building on ALLOSMOD from Sali lab) to capture glycan behavior realistically. Starting from an experimentally determined protein scaffold, individual glycans are modeled at their glycosylation sites and extensively sampled using energy minimization and simulated annealing. Thousands of distinct conformations are generated to form an ensemble that represents the accessible conformational space of the fully glycosylated protein.
+              </p>
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-[#1A1A1A] mb-2">Glycan Encounter Factor (GEF)</h4>
+              <p className="leading-relaxed">
+                Shielding is quantified using the Glycan Encounter Factor (GEF), which measures the probability that an approaching probe—representing the first line of antibody contact—encounters glycan atoms before reaching the protein surface. GEF produces spatial maps that distinguish persistently shielded regions from potential sites of vulnerability.
+              </p>
+            </div>
+
+            {/* align.ali documentation */}
+            <div className="border-t border-[#1A1A1A]/10 pt-4">
+              <h4 className="font-semibold text-[#8B7DFF] mb-2 flex items-center gap-2">
+                <FileText className="w-4 h-4" />
+                Required Input: align.ali
+              </h4>
+              <p className="leading-relaxed mb-3">
+                GlycoShield uses a MODELLER-style alignment file to define the relationship between template structures and the target protein. This alignment generates structural restraints during model construction and ensemble generation.
+              </p>
+              <div className="bg-[#F5F4F9]/50 p-3 rounded-lg space-y-2">
+                <p className="font-medium text-[#1A1A1A]">File Format Requirements:</p>
+                <ul className="list-disc list-inside space-y-1 text-[#1A1A1A]/70">
+                  <li>Follow Sali Lab MODELLER alignment syntax</li>
+                  <li>Contain one entry for each template PDB file plus one target sequence entry named <code className="bg-white px-1 rounded">pm.pdb</code></li>
+                  <li>Each entry begins with a <code className="bg-white px-1 rounded">&gt;P1;</code> header</li>
+                  <li>Alignment code must exactly match the corresponding PDB filename</li>
+                  <li>Multiple chains: Specify by separating chains with <code className="bg-white px-1 rounded">/</code></li>
+                  <li>Each sequence must end with a terminating <code className="bg-white px-1 rounded">*</code></li>
+                </ul>
+              </div>
+              <div className="mt-3 bg-orange-50 border border-orange-200 p-3 rounded-lg">
+                <div className="flex items-start gap-2">
+                  <AlertTriangle className="w-4 h-4 text-orange-600 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="font-medium text-orange-800">Critical: Alignment Quality</p>
+                    <p className="text-orange-700 text-xs mt-1">
+                      Small alignment errors can lead to large structural artifacts during simulation. Avoid misalignments where adjacent residues are aligned far apart, pay attention to chain termini where errors often occur, and ensure gaps and insertions are biologically reasonable.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* glyc.dat documentation */}
+            <div className="border-t border-[#1A1A1A]/10 pt-4">
+              <h4 className="font-semibold text-[#8B7DFF] mb-2 flex items-center gap-2">
+                <FileText className="w-4 h-4" />
+                Required Input: glyc.dat
+              </h4>
+              <p className="leading-relaxed mb-3">
+                This file defines the explicit chemical structure of each glycan to be attached to the protein, specifying glycans at the monomer-by-monomer level following Sali Lab/MODELLER glycosylation format.
+              </p>
+              <div className="bg-[#F5F4F9]/50 p-3 rounded-lg space-y-3">
+                <div>
+                  <p className="font-medium text-[#1A1A1A] mb-1">File Structure:</p>
+                  <p className="text-[#1A1A1A]/70 text-xs">One line per sugar monomer. Each line contains three columns: <code className="bg-white px-1 rounded">&lt;monomer_name&gt; &lt;bond_type&gt; &lt;attachment_residue_index&gt;</code></p>
+                </div>
+                <div>
+                  <p className="font-medium text-[#1A1A1A] mb-1">Supported Monomers:</p>
+                  <div className="grid grid-cols-2 gap-1 text-xs text-[#1A1A1A]/70">
+                    <span>• NAG – β-N-Acetyl-D-Glucosamine</span>
+                    <span>• NGA – β-N-Acetyl-D-Galactosamine</span>
+                    <span>• GLB – β-Galactose</span>
+                    <span>• FUC – α-Fucose</span>
+                    <span>• MAN – α-Mannose</span>
+                    <span>• BMA – β-Mannose</span>
+                    <span>• NAN – α-Neuraminic acid</span>
+                  </div>
+                </div>
+                <div>
+                  <p className="font-medium text-[#1A1A1A] mb-1">Bond Types:</p>
+                  <div className="text-xs text-[#1A1A1A]/70 space-y-1">
+                    <p><strong>Protein–glycan:</strong> NGLA/NGLB (to ASN), SGPA/SGPB (to SER), TGPA/TGPB (to THR)</p>
+                    <p><strong>Glycan–glycan:</strong> 16ab, 16fu, 14bb, 13ab, 13bb, 12aa, 12ba</p>
+                    <p><strong>Sialic acid:</strong> sa23 (α 2→3), sa26 (α 2→6)</p>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-3 bg-gray-900 p-3 rounded-lg overflow-x-auto">
+                <p className="text-xs text-gray-400 mb-2">Example: Mannose-9 at residue 58</p>
+                <pre className="text-xs text-green-400 font-mono">{`NAG NGLB 58
+NAG 14bb 1
+BMA 14bb 2
+MAN 13ab 3
+MAN 16ab 3
+MAN 13ab 5
+MAN 16ab 5
+MAN 12aa 7
+MAN 12aa 6
+MAN 12aa 4
+MAN 12aa 10`}</pre>
+              </div>
+            </div>
+
+            {/* input.dat documentation */}
+            <div className="border-t border-[#1A1A1A]/10 pt-4">
+              <h4 className="font-semibold text-[#8B7DFF] mb-2 flex items-center gap-2">
+                <FileText className="w-4 h-4" />
+                Required Input: input.dat
+              </h4>
+              <p className="leading-relaxed mb-3">
+                Configuration file that specifies runtime parameters for the GlycoShield analysis pipeline.
+              </p>
+              <div className="bg-[#F5F4F9]/50 p-3 rounded-lg">
+                <p className="font-medium text-[#1A1A1A] mb-1">Key Parameters:</p>
+                <ul className="list-disc list-inside space-y-1 text-[#1A1A1A]/70 text-xs">
+                  <li><code className="bg-white px-1 rounded">NRUNS</code> – Number of ensemble conformations to generate</li>
+                  <li><code className="bg-white px-1 rounded">GEF_PROBE_RADIUS</code> – Probe radius for accessibility calculations (Å)</li>
+                  <li><code className="bg-white px-1 rounded">DEVIATION</code> – Structural deviation parameter</li>
+                  <li><code className="bg-white px-1 rounded">TEMPERATURE</code> – Simulation temperature (K)</li>
+                  <li><code className="bg-white px-1 rounded">SAMPLING</code> – Sampling method (e.g., simulation)</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* File Upload */}

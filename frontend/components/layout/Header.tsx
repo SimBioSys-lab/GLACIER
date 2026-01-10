@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState } from "react"
+import Link from "next/link"
 import SimplifiedGlassSurface from '../SimplifiedGlassSurface'
 
 interface HeaderProps {
@@ -36,35 +37,37 @@ export default function Header({ onScrollToForm }: HeaderProps) {
 
             {/* CENTER: The Hero Interaction */}
             <div className="flex justify-center">
-              <div 
-                className="relative flex flex-col items-center justify-center cursor-pointer min-w-[300px]"
-                onMouseEnter={() => setIsHovered(true)}
-                onMouseLeave={() => setIsHovered(false)}
-              >
-                <div className="text-center relative">
-                  {isHovered ? (
-                    <h5 
-                      className="text-l font-mono text-black/70 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap transition-opacity duration-300"
-                      style={{ 
-                        fontFamily: 'var(--font-nothing), monospace',
-                        opacity: isHovered ? 1 : 0
-                      }}
-                    >
-                      Glycan Accessibility Computational Infrastructure for Ensemble Research
-                    </h5>
-                  ) : (
-                    <h1 
-                      className="text-2xl font-mono text-black transition-opacity duration-300" 
-                      style={{ 
-                        fontFamily: 'var(--font-nothing), monospace',
-                        opacity: isHovered ? 0 : 1
-                      }}
-                    >
-                      GLACIER
-                    </h1>
-                  )}
+              <Link href="/">
+                <div 
+                  className="relative flex flex-col items-center justify-center cursor-pointer min-w-[300px]"
+                  onMouseEnter={() => setIsHovered(true)}
+                  onMouseLeave={() => setIsHovered(false)}
+                >
+                  <div className="text-center relative">
+                    {isHovered ? (
+                      <h5 
+                        className="text-l font-mono text-black/70 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap transition-opacity duration-300"
+                        style={{ 
+                          fontFamily: 'var(--font-nothing), monospace',
+                          opacity: isHovered ? 1 : 0
+                        }}
+                      >
+                        Glycan Accessibility Computational Infrastructure for Ensemble Research
+                      </h5>
+                    ) : (
+                      <h1 
+                        className="text-2xl font-mono text-black transition-opacity duration-300" 
+                        style={{ 
+                          fontFamily: 'var(--font-nothing), monospace',
+                          opacity: isHovered ? 0 : 1
+                        }}
+                      >
+                        GLACIER
+                      </h1>
+                    )}
+                  </div>
                 </div>
-              </div>
+              </Link>
             </div>
 
             {/* RIGHT: Empty div to balance the grid (Keeps GLACIER centered) */}
