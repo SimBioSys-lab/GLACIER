@@ -1,6 +1,7 @@
 "use client"
 
 import React from "react"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
 export default function Footer() {
@@ -31,31 +32,61 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="text-white font-medium mb-4">GlycoShield</h4>
+            <h4 className="text-white font-medium mb-4">
+              <Link href="/glycoshield" className="hover:text-[#8B7DFF] transition-colors">
+                GlycoShield
+              </Link>
+            </h4>
             <ul className="space-y-2 text-white/70">
               <li>
-                AllosMod Lib
+                <a 
+                  href="https://salilab.org/allosmod/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="hover:text-white transition-colors"
+                >
+                  AllosMod Lib
+                </a>
               </li>
               <li>
-                Ensemble Modelling
+                <a 
+                  href="https://salilab.org/modeller/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="hover:text-white transition-colors"
+                >
+                  Ensemble Modelling
+                </a>
               </li>
               <li>
-                GEF Analysis
+                <Link href="/glycoshield" className="hover:text-white transition-colors">
+                  GEF Analysis
+                </Link>
               </li>
             </ul>
           </div>
 
           <div>
-            <h4 className="text-white font-medium mb-4">VASCO</h4>
+            <h4 className="text-white font-medium mb-4">
+              <Link href="/vasco" className="hover:text-[#8B7DFF] transition-colors">
+                VASCO
+              </Link>
+            </h4>
             <ul className="space-y-2 text-white/70">
               <li>
-                Paratope Prediction
+                <Link href="/vasco" className="hover:text-white transition-colors">
+                  Paratope Prediction
+                </Link>
               </li>
               <li>
-                Epitope Prediction
+                <Link href="/vasco" className="hover:text-white transition-colors">
+                  Epitope Prediction
+                </Link>
               </li>
               <li>
-                Interface Analysis
+                <Link href="/vasco" className="hover:text-white transition-colors">
+                  Interface Analysis
+                </Link>
               </li>
             </ul>
           </div>
@@ -64,7 +95,7 @@ export default function Footer() {
             <h4 className="text-white font-medium mb-4">Company</h4>
             <ul className="space-y-2 text-white/70">
               <li>
-                <a href="https://www.simbiosyslab.com/home" className="hover:text-white transition-colors" target="_blank">
+                <a href="https://www.simbiosyslab.com/home" className="hover:text-white transition-colors" target="_blank" rel="noopener noreferrer">
                   About Us
                 </a>
               </li>

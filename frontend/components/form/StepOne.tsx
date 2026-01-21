@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import FilePreview from "@/components/file-preview"
 import { InfoModal, InfoButton } from "@/components/InfoModal"
-import { loadExampleFiles, isExampleData, EXAMPLE_DATA } from "@/services/exampleDataService"
+import { loadExampleFiles, loadExampleFilesByType, getExampleDownloadFiles, isExampleData, EXAMPLE_DATA, EXAMPLE_OPTIONS, ExampleType } from "@/services/exampleDataService"
 import { MAX_FILES } from "@/app/config"
 import { validateFiles, getFileValidationMessage, isPDBFile } from "@/utils/fileValidation"
 import { readAndParseInputDat } from "@/utils/inputDatParser"
@@ -31,22 +31,9 @@ const downloadFile = (url: string, filename: string) => {
   document.body.removeChild(a)
 }
 
-// Helper function to download all example files (both folders)
-const downloadExampleFiles = () => {
-  const files = [
-    // SpikeD files
-    { url: '/examples/spikeD/start.pdb', name: 'spikeD_start.pdb' },
-    { url: '/examples/spikeD/align.ali', name: 'spikeD_align.ali' },
-    { url: '/examples/spikeD/glyc.dat', name: 'spikeD_glyc.dat' },
-    { url: '/examples/spikeD/input.dat', name: 'spikeD_input.dat' },
-    // BG505 files
-    { url: '/examples/bg505/bg505.pdb', name: 'bg505_bg505.pdb' },
-    { url: '/examples/bg505/align.ali', name: 'bg505_align.ali' },
-    { url: '/examples/bg505/glyc.dat', name: 'bg505_glyc.dat' },
-    { url: '/examples/bg505/input.dat', name: 'bg505_input.dat' }
-  ]
-
-  // Download each file with a small delay to prevent blocking
+// Helper function to download example files by type
+const downloadExampleFilesByType = (type: ExampleType) => {
+  const files = getExampleDownloadFiles(type)
   files.forEach((file, index) => {
     setTimeout(() => {
       downloadFile(file.url, file.name)
@@ -80,7 +67,7 @@ const FolderConfigPanel = ({
         {/* Number of Runs */}
         <div className="space-y-2">
           <Label className="text-xs text-[#1A1A1A]">
-            Number of Runs
+            Number of Frames
             {config.loadedFromInputDat?.nruns && (
               <span className="ml-1 text-[#8B7DFF]">(from input.dat)</span>
             )}
@@ -102,6 +89,9 @@ const FolderConfigPanel = ({
             }}
             className="h-8 text-sm bg-white/70 border-[#1A1A1A]/20"
           />
+          <p className="text-xs text-amber-600 mt-1">
+            💡 At least 100 frames recommended for statistically meaningful GEF results
+          </p>
         </div>
         
         {/* GEF Probe Radius */}
@@ -190,7 +180,10 @@ export default function StepOne({
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [isLoadingExample, setIsLoadingExample] = useState(false);
   const [isExample, setIsExample] = useState(false);
+  const [currentExampleType, setCurrentExampleType] = useState<ExampleType | null>(null);
+  const [currentExampleName, setCurrentExampleName] = useState('');
   const [isDownloadingExample, setIsDownloadingExample] = useState(false);
+  const [showExampleSelector, setShowExampleSelector] = useState(false);
 
   const toggleDocSection = (section: string) => {
     setExpandedDocs(prev => {
@@ -237,18 +230,27 @@ export default function StepOne({
     })
   }, [folderConfigs, updateFolderConfig])
 
-  const handleLoadExample = async () => {
+  const handleLoadExample = async (type: ExampleType = 'both') => {
     setIsLoadingExample(true);
+    setShowExampleSelector(false);
     try {
-      const exampleData = await loadExampleFiles();
+      const exampleData = await loadExampleFilesByType(type);
       onFilesChange(exampleData.files);
       onFormDataChange(exampleData.formData);
       setIsExample(true);
+      setCurrentExampleType(type);
+      setCurrentExampleName(exampleData.exampleName);
       
-      // Auto-expand both example folders
-      setExpandedFolders(new Set(['spikeD', 'bg505']));
+      // Auto-expand the relevant example folders
+      if (type === 'both') {
+        setExpandedFolders(new Set(['spikeD', 'bg505']));
+      } else if (type === 'spikeD') {
+        setExpandedFolders(new Set(['spikeD']));
+      } else {
+        setExpandedFolders(new Set(['bg505']));
+      }
       
-      console.log('Example files loaded successfully');
+      console.log(`Example files loaded successfully: ${type}`);
     } catch (error) {
       console.error('Failed to load example files:', error);
       alert('Failed to load example files. Please try again.');
@@ -258,9 +260,10 @@ export default function StepOne({
   };
 
   const handleDownloadExample = () => {
+    if (!currentExampleType) return;
     setIsDownloadingExample(true);
-    console.log('Starting download of example files...');
-    downloadExampleFiles();
+    console.log(`Starting download of example files: ${currentExampleType}`);
+    downloadExampleFilesByType(currentExampleType);
     setTimeout(() => {
       setIsDownloadingExample(false);
       console.log('Example files download initiated');
@@ -381,10 +384,12 @@ export default function StepOne({
             <FlaskRound className="w-5 h-5 text-[#8B7DFF]" />
             <div className="flex-1 text-left">
               <h4 className="text-sm font-medium text-[#1A1A1A]">
-                Viewing Example Data: {EXAMPLE_DATA.name}
+                Viewing Example Data: {currentExampleName}
               </h4>
               <p className="text-xs text-[#1A1A1A]/70 mt-1">
-                {EXAMPLE_DATA.description}
+                {currentExampleType === 'spikeD' && EXAMPLE_OPTIONS.spikeD.description}
+                {currentExampleType === 'bg505' && EXAMPLE_OPTIONS.bg505.description}
+                {currentExampleType === 'both' && 'Two example analyses: SARS-CoV-2 spike protein and HIV BG505 envelope protein glycosylation'}
               </p>
               <div className="flex items-center gap-2 mt-2">
                 <Button
@@ -407,7 +412,7 @@ export default function StepOne({
                   )}
                 </Button>
                 <p className="text-xs text-[#1A1A1A]/60">
-                  Download all 8 example files (2 folders) to your computer
+                  {currentExampleType === 'both' ? 'Download all 8 example files (2 folders)' : 'Download 4 example files (1 folder)'}
                 </p>
               </div>
             </div>
@@ -417,6 +422,8 @@ export default function StepOne({
               onClick={() => {
                 onFilesChange([]);
                 setIsExample(false);
+                setCurrentExampleType(null);
+                setCurrentExampleName('');
               }}
               className="text-xs text-[#1A1A1A]/60 hover:text-[#1A1A1A]"
             >
@@ -437,11 +444,32 @@ export default function StepOne({
       </div>
 
       {/* Processing Time Notice */}
-      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3">
-        <Info className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
-        <div className="text-sm text-amber-800">
-          <p className="font-medium">Processing Time & Results</p>
-          <p className="mt-1">The complete analysis, including ensemble modeling and full structural analysis, can take up to 24 hours. A results link will be provided immediately upon submission where you can check the status and access your results once ready.</p>
+      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+        <div className="flex items-start gap-3">
+          <Info className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
+          <div className="text-sm text-amber-800">
+            <p className="font-medium mb-2">Processing Time & Pipeline Stages</p>
+            <p className="mb-3">The complete GlycoShield analysis involves multiple computational stages:</p>
+            <div className="bg-amber-100/50 rounded-lg p-3 space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="w-6 h-6 rounded-full bg-amber-200 text-amber-800 text-xs font-bold flex items-center justify-center">1</span>
+                <span><strong>AllosMod Ensemble Generation</strong> — 2-8 hours</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-6 h-6 rounded-full bg-amber-200 text-amber-800 text-xs font-bold flex items-center justify-center">2</span>
+                <span><strong>PDB Processing & Alignment</strong> — 1-2 hours</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-6 h-6 rounded-full bg-amber-200 text-amber-800 text-xs font-bold flex items-center justify-center">3</span>
+                <span><strong>GEF Surface Analysis</strong> — 30-45 hours</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-6 h-6 rounded-full bg-amber-200 text-amber-800 text-xs font-bold flex items-center justify-center">4</span>
+                <span><strong>Results Upload & Finalization</strong></span>
+              </div>
+            </div>
+            <p className="mt-3 text-amber-700">A results link will be provided immediately upon submission where you can check the status and access your results once ready.</p>
+          </div>
         </div>
       </div>
 
@@ -641,23 +669,90 @@ MAN 12aa 10`}</pre>
 
           {/* Example Run Link */}
           {files.length === 0 && (
-            <button
-              onClick={handleLoadExample}
-              disabled={isLoadingExample}
-              className="text-[#8B7DFF] hover:text-[#8B7DFF]/80 underline text-sm mb-4 transition-colors disabled:opacity-50"
-            >
-              {isLoadingExample ? (
-                <span className="flex items-center gap-2">
-                  <span className="animate-spin">⏳</span>
-                  Loading example...
-                </span>
-              ) : (
-                <span className="flex items-center gap-2">
+            <div className="mb-4">
+              {!showExampleSelector ? (
+                <button
+                  onClick={() => setShowExampleSelector(true)}
+                  disabled={isLoadingExample}
+                  className="text-[#8B7DFF] hover:text-[#8B7DFF]/80 underline text-sm transition-colors disabled:opacity-50 inline-flex items-center gap-2"
+                >
                   <FlaskRound className="w-4 h-4" />
                   Try an example run
-                </span>
+                </button>
+              ) : (
+                <div className="bg-white border border-[#8B7DFF]/30 rounded-xl p-4 max-w-xl mx-auto shadow-lg">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-sm font-medium text-[#1A1A1A] flex items-center gap-2">
+                      <FlaskRound className="w-4 h-4 text-[#8B7DFF]" />
+                      Choose Example Dataset
+                    </h4>
+                    <button
+                      onClick={() => setShowExampleSelector(false)}
+                      className="text-[#1A1A1A]/40 hover:text-[#1A1A1A] p-1"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {/* SARS-CoV-2 Option */}
+                    <button
+                      onClick={() => handleLoadExample('spikeD')}
+                      disabled={isLoadingExample}
+                      className="group p-3 border border-[#1A1A1A]/10 rounded-lg hover:border-[#8B7DFF] hover:bg-[#8B7DFF]/5 transition-all text-left disabled:opacity-50"
+                    >
+                      <div className="text-2xl mb-2">{EXAMPLE_OPTIONS.spikeD.icon}</div>
+                      <h5 className="text-sm font-medium text-[#1A1A1A] group-hover:text-[#8B7DFF]">
+                        {EXAMPLE_OPTIONS.spikeD.shortName}
+                      </h5>
+                      <p className="text-xs text-[#1A1A1A]/60 mt-1">
+                        SARS-CoV-2 D614G variant
+                      </p>
+                      <p className="text-xs text-[#8B7DFF] mt-2">4 files</p>
+                    </button>
+                    
+                    {/* HIV BG505 Option */}
+                    <button
+                      onClick={() => handleLoadExample('bg505')}
+                      disabled={isLoadingExample}
+                      className="group p-3 border border-[#1A1A1A]/10 rounded-lg hover:border-[#8B7DFF] hover:bg-[#8B7DFF]/5 transition-all text-left disabled:opacity-50"
+                    >
+                      <div className="text-2xl mb-2">{EXAMPLE_OPTIONS.bg505.icon}</div>
+                      <h5 className="text-sm font-medium text-[#1A1A1A] group-hover:text-[#8B7DFF]">
+                        {EXAMPLE_OPTIONS.bg505.shortName}
+                      </h5>
+                      <p className="text-xs text-[#1A1A1A]/60 mt-1">
+                        HIV-1 envelope trimer
+                      </p>
+                      <p className="text-xs text-[#8B7DFF] mt-2">4 files</p>
+                    </button>
+                    
+                    {/* Both Option */}
+                    <button
+                      onClick={() => handleLoadExample('both')}
+                      disabled={isLoadingExample}
+                      className="group p-3 border-2 border-[#8B7DFF]/30 rounded-lg hover:border-[#8B7DFF] hover:bg-[#8B7DFF]/5 transition-all text-left disabled:opacity-50 bg-[#8B7DFF]/5"
+                    >
+                      <div className="text-2xl mb-2">🧬🦠</div>
+                      <h5 className="text-sm font-medium text-[#8B7DFF]">
+                        Both Examples
+                      </h5>
+                      <p className="text-xs text-[#1A1A1A]/60 mt-1">
+                        Multi-protein analysis
+                      </p>
+                      <p className="text-xs text-[#8B7DFF] mt-2">8 files (2 folders)</p>
+                    </button>
+                  </div>
+                  
+                  {isLoadingExample && (
+                    <div className="mt-3 text-center text-sm text-[#8B7DFF]">
+                      <span className="animate-spin inline-block mr-2">⏳</span>
+                      Loading example files...
+                    </div>
+                  )}
+                </div>
               )}
-            </button>
+            </div>
           )}
 
           <div className="flex flex-wrap justify-center gap-2">
