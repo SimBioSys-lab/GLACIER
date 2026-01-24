@@ -195,15 +195,6 @@ export default function GlycoShieldCitation() {
                 <p className="text-center text-sm text-[#1A1A1A]/70" style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}>
                   The GlycoShield pipeline in its current form has been developed together by the{' '}
                   <a 
-                    href="https://www.simbiosyslab.com/" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-[#8B7DFF] hover:underline font-semibold"
-                  >
-                    SimBioSys Lab
-                  </a>
-                  , the{' '}
-                  <a 
                     href="https://cnls.lanl.gov/External/people/Gnana_Gnanakaran.php" 
                     target="_blank" 
                     rel="noopener noreferrer"
@@ -211,7 +202,7 @@ export default function GlycoShieldCitation() {
                   >
                     Gnanakaran Group
                   </a>
-                  , and the{' '}
+                  , the{' '}
                   <a 
                     href="https://zberndsen.mufaculty.umsystem.edu/home" 
                     target="_blank" 
@@ -219,6 +210,15 @@ export default function GlycoShieldCitation() {
                     className="text-[#8B7DFF] hover:underline font-semibold"
                   >
                     Berndsen Group
+                  </a>
+                  , and the{' '}
+                  <a 
+                    href="https://www.simbiosyslab.com/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-[#8B7DFF] hover:underline font-semibold"
+                  >
+                    SimBioSys Lab
                   </a>
                   .
                 </p>

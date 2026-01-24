@@ -449,7 +449,7 @@ export default function StepOne({
           <Info className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
           <div className="text-sm text-amber-800">
             <p className="font-medium mb-2">Processing Time & Pipeline Stages</p>
-            <p className="mb-3">The complete GlycoShield analysis involves multiple computational stages:</p>
+            <p className="mb-3">The complete GlycoShield analysis involves multiple computational stages. <span className="font-semibold">Times shown are for generating an ensemble of ~1000 frames:</span></p>
             <div className="bg-amber-100/50 rounded-lg p-3 space-y-2">
               <div className="flex items-center gap-2">
                 <span className="w-6 h-6 rounded-full bg-amber-200 text-amber-800 text-xs font-bold flex items-center justify-center">1</span>
@@ -467,6 +467,11 @@ export default function StepOne({
                 <span className="w-6 h-6 rounded-full bg-amber-200 text-amber-800 text-xs font-bold flex items-center justify-center">4</span>
                 <span><strong>Results Upload & Finalization</strong></span>
               </div>
+            </div>
+            <div className="mt-3 p-3 bg-green-100/70 border border-green-300/50 rounded-lg">
+              <p className="text-green-800 text-xs">
+                <span className="font-semibold">⚡ For comparison:</span> Typical time to generate equivalent ensembles using Molecular Dynamics (MD): <span className="font-bold">several weeks</span> with H100 NVIDIA GPU or equivalent.
+              </p>
             </div>
             <p className="mt-3 text-amber-700">A results link will be provided immediately upon submission where you can check the status and access your results once ready.</p>
           </div>
