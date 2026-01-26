@@ -100,46 +100,6 @@ export default function CitationSection() {
             </p>
           </div>
 
-          {/* Collaborative Attribution - Prominent Statement */}
-          <div className="mb-12">
-            <div className="relative bg-white/50 backdrop-blur-sm rounded-2xl border border-[#8B7DFF]/20 p-8 md:p-10 text-center shadow-sm">
-              <div className="absolute inset-0 bg-gradient-to-r from-[#8B7DFF]/5 via-transparent to-[#8B7DFF]/5 rounded-2xl" />
-              <p 
-                className="relative text-xl md:text-2xl font-light text-[#1A1A1A]/80 leading-relaxed"
-                style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}
-              >
-                The GLACIER platform has been developed together by the{' '}
-                <a 
-                  href="https://cnls.lanl.gov/External/people/Gnana_Gnanakaran.php" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-[#8B7DFF] hover:text-[#7B6DFF] font-medium transition-colors"
-                >
-                  Gnanakaran Group
-                </a>
-                , the{' '}
-                <a 
-                  href="https://zberndsen.mufaculty.umsystem.edu/home" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-[#8B7DFF] hover:text-[#7B6DFF] font-medium transition-colors"
-                >
-                  Berndsen Group
-                </a>
-                , and the{' '}
-                <a 
-                  href="https://www.simbiosyslab.com/" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-[#8B7DFF] hover:text-[#7B6DFF] font-medium transition-colors"
-                >
-                  SimBioSys Lab
-                </a>
-                .
-              </p>
-            </div>
-          </div>
-
           {/* Format Selector - Simplified */}
           <div className="flex justify-center mb-8">
             <div className="inline-flex p-2 rounded-xl bg-white/60 backdrop-blur-sm border border-[#1A1A1A]/10 shadow-sm">

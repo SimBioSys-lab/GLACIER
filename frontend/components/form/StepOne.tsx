@@ -484,7 +484,7 @@ export default function StepOne({
           <BookOpen className="w-5 h-5 text-purple-600 mt-0.5 flex-shrink-0" />
           <div className="text-sm text-purple-800 flex-1">
             <p className="font-medium mb-2">Related Publications</p>
-            <p className="mb-3">If you use GLACIER in your research, please cite our related publications:</p>
+            <p className="mb-3">If you use GlycoShield in your research, please cite our related publications:</p>
             <div className="space-y-2">
               <a 
                 href="https://pubmed.ncbi.nlm.nih.gov/33319171/" 

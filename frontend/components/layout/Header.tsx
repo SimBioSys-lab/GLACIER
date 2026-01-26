@@ -52,7 +52,7 @@ export default function Header({ onScrollToForm }: HeaderProps) {
                           opacity: isHovered ? 1 : 0
                         }}
                       >
-                        Glycan Accessibility Computational Infrastructure for Ensemble Research
+                        Glycoconjugate Laboratory for Analysis & Computational Infrastructure for Enabling Research
                       </h5>
                     ) : (
                       <h1 

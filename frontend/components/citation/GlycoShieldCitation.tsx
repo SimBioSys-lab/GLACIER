@@ -184,43 +184,11 @@ export default function GlycoShieldCitation() {
 
               {/* Additional Information */}
               <div className="mt-8 pt-6 border-t border-[#1A1A1A]/10">
-                <p className="text-center text-sm text-[#1A1A1A]/60 mb-4" style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}>
+                <p className="text-center text-sm text-[#1A1A1A]/60" style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}>
                   For questions about citations or to report issues, please contact{' '}
                   <a href="mailto:simbiosyslab.neu@gmail.com" className="text-[#8B7DFF] hover:underline font-semibold">
                     simbiosyslab.neu@gmail.com
                   </a>
-                </p>
-                
-                {/* Pipeline Attribution */}
-                <p className="text-center text-sm text-[#1A1A1A]/70" style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}>
-                  The GlycoShield pipeline in its current form has been developed together by the{' '}
-                  <a 
-                    href="https://cnls.lanl.gov/External/people/Gnana_Gnanakaran.php" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-[#8B7DFF] hover:underline font-semibold"
-                  >
-                    Gnanakaran Group
-                  </a>
-                  , the{' '}
-                  <a 
-                    href="https://zberndsen.mufaculty.umsystem.edu/home" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-[#8B7DFF] hover:underline font-semibold"
-                  >
-                    Berndsen Group
-                  </a>
-                  , and the{' '}
-                  <a 
-                    href="https://www.simbiosyslab.com/" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-[#8B7DFF] hover:underline font-semibold"
-                  >
-                    SimBioSys Lab
-                  </a>
-                  .
                 </p>
               </div>
             </div>

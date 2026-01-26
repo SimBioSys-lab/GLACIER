@@ -3,6 +3,8 @@
 import React, { useState, useRef } from "react"
 import Header from "@/components/layout/Header"
 import Footer from "@/components/layout/Footer"
+import GlacierDescription from "@/components/layout/GlacierDescription"
+import GlycoShieldAttribution from "@/components/layout/GlycoShieldAttribution"
 import MultiStepForm from "@/components/form/MultiStepForm"
 import { SubmissionStatus } from "@/components/submission-status"
 import GlycoShieldCitation from "@/components/citation/GlycoShieldCitation"
@@ -44,6 +46,12 @@ export default function GlycoShieldPage() {
       <main className="relative pt-32">
         {/* Carousel Section */}
         <GlycoShieldCarousel />
+
+        {/* GlycoShield Attribution */}
+        <GlycoShieldAttribution />
+
+        {/* GLACIER Description - Above Form */}
+        <GlacierDescription />
 
         {/* Multi-Step Form Section */}
         <MultiStepForm 

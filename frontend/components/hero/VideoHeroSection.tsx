@@ -159,7 +159,7 @@ export default function VideoHeroSection() {
                         {/* Subheadline */}
                         <div className="mb-6 max-w-lg">
                           <p className="text-base text-black/70 leading-relaxed" style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}>
-                            Understanding protein glycosylation shouldn't require supercomputing expertise. <span className="font-medium">Democratizing structural biology</span> through accessible computational tools.
+                            Ensemble-based geometric exposure analysis for quantifying glycan shielding on viral surface proteins.
                           </p>
                         </div>
 

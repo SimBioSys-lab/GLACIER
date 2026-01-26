@@ -3,6 +3,7 @@
 import React from "react"
 import Header from "@/components/layout/Header"
 import Footer from "@/components/layout/Footer"
+import GlacierDescription from "@/components/layout/GlacierDescription"
 import VideoHeroSection from "@/components/hero/VideoHeroSection"
 import CitationSection from "@/components/citation/CitationSection"
 import CitationWidget from "@/components/citation/CitationWidget"
@@ -22,6 +23,9 @@ export default function CicadaSimBioSysInterface() {
       <main className="relative">
         {/* Hero Section with Video Background */}
         <VideoHeroSection />
+
+        {/* GLACIER Description */}
+        <GlacierDescription />
 
         {/* Citation Section */}
         <div id="citation">

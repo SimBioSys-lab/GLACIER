@@ -13,9 +13,9 @@ export default function Footer() {
             <h3 className="text-2xl font-light text-white mb-2">
               GLACIER
             </h3>
-            <h2 className="text-white mb-3 text-xl font-light">Glycan Accessibility Computational Infrastructure for Ensemble Research</h2>
+            <h2 className="text-white mb-3 text-xl font-light">Glycoconjugate Laboratory for Analysis & Computational Infrastructure for Enabling Research</h2>
             <p className="text-white/70 leading-relaxed mb-6">
-              Advancing structural glycobiology through computational innovation and machine learning.
+              Advancing structural glycobiology through computational innovation, first-principles driven simulations and machine learning.
             </p>
             <div className="flex space-x-4">
               <Button variant="ghost" className="text-white/60 hover:text-white p-2">

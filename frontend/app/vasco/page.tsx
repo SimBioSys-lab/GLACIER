@@ -3,6 +3,7 @@
 import React, { useState, useRef } from "react"
 import Header from "@/components/layout/Header"
 import Footer from "@/components/layout/Footer"
+import GlacierDescription from "@/components/layout/GlacierDescription"
 import ParatopeMultiStepForm from "@/components/paratope-form/ParatopeMultiStepForm"
 import ParatopeCitation from "@/components/citation/ParatopeCitation"
 import { ParatopeSubmissionStatus } from "@/components/paratope-submission-status"
@@ -51,6 +52,9 @@ export default function VascoPage() {
 
       {/* Main Content Container with top spacing */}
       <main className="relative pt-32">
+        {/* GLACIER Description */}
+        <GlacierDescription />
+
         {/* Carousel Section - TODO: Add later */}
         {/* <VascoCarousel /> */}
 
