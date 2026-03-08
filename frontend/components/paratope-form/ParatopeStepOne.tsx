@@ -343,7 +343,7 @@ export default function ParatopeStepOne({
           <button
             onClick={handleLoadExample}
             disabled={isLoadingExample}
-            className="text-[#FF6B9D] hover:text-[#FF6B9D]/80 underline text-sm transition-colors disabled:opacity-50 inline-flex items-center gap-2"
+            className="text-[#FF6B9D] hover:text-[#FF6B9D]/80 underline text-lg md:text-xl font-medium transition-colors disabled:opacity-50 inline-flex items-center gap-2"
           >
             {isLoadingExample ? (
               <>
@@ -352,7 +352,7 @@ export default function ParatopeStepOne({
               </>
             ) : (
               <>
-                <FlaskRound className="w-4 h-4" />
+                <FlaskRound className="w-5 h-5" />
                 Try an example run
               </>
             )}

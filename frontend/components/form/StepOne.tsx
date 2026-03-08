@@ -679,9 +679,9 @@ MAN 12aa 10`}</pre>
                 <button
                   onClick={() => setShowExampleSelector(true)}
                   disabled={isLoadingExample}
-                  className="text-[#8B7DFF] hover:text-[#8B7DFF]/80 underline text-sm transition-colors disabled:opacity-50 inline-flex items-center gap-2"
+                  className="text-[#8B7DFF] hover:text-[#8B7DFF]/80 underline text-lg md:text-xl font-medium transition-colors disabled:opacity-50 inline-flex items-center gap-2"
                 >
-                  <FlaskRound className="w-4 h-4" />
+                  <FlaskRound className="w-5 h-5" />
                   Try an example run
                 </button>
               ) : (
